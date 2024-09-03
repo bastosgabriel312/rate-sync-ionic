@@ -1,0 +1,7 @@
+{
+  "name": "rate-sync-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
