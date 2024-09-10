@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiDomain: 'https://localhost:8000/api/v1/'
+  apiDomain: 'http://rate-sync-production.up.railway.app/api/v1'
 };
