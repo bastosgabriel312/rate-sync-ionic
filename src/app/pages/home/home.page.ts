@@ -38,7 +38,6 @@ export class HomePage {
   }
   
   onSearchClear() {
-    console.log('search cleared')
     this.movieResults = [];
     this.isLoadingSearch = false;
   }

@@ -1,5 +1,6 @@
 <ion-searchbar 
   [(ngModel)]="query" 
   (ionInput)="onSearchChange($event)"
+  (ionClear)="onSearchClear($event)"
   placeholder="Pesquisar">
 </ion-searchbar>

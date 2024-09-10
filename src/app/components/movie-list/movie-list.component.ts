@@ -9,7 +9,4 @@ export class MovieListComponent {
   @Input() movies: any[] = [];
   @Input() isLoading: boolean = false;
 
-  ngOnInit(){
-    console.log("Movie> ", this.movies)
-  }
 }

@@ -11,11 +11,14 @@ export class SearchBarComponent {
   @Output() onSearchCleared: EventEmitter<string> = new EventEmitter<string>();
 
   onSearchChange(event: any) {
-    this.searchChange.emit(this.query);
+    if (event?.detail?.value == '') {
+      this.onSearchCleared.emit(event);
+    } else {
+      this.searchChange.emit(this.query);
+    }
   }
 
-  onSearchClear(event:any){
-    console.log('limpa')
+  onSearchClear(event: any) {
     this.onSearchCleared.emit(event);
   }
 }

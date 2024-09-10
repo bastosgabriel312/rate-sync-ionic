@@ -21,7 +21,6 @@ export class MovieItemComponent implements OnInit {
     this.apiService.getMovieRatings(this.movie.title).subscribe({
       next: (data) => {
         this.reviews = data;
-        console.log(data)
         this.isLoading = false;
       },
       error: (error) => {
