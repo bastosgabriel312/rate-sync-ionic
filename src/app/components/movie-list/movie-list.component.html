@@ -1,0 +1,7 @@
+<ion-list *ngIf="movies.length > 0 && !isLoading">
+  <app-movie-item *ngFor="let movie of movies" [movie]="movie"></app-movie-item>
+</ion-list>
+
+<ion-list *ngIf="isLoading">
+  <app-movie-item-skeleton/>
+</ion-list>

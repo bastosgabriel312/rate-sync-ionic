@@ -1,0 +1,62 @@
+<ion-list *ngIf="movie?.title">
+  <ion-accordion-group (ionChange)="accordionGroupChange($event)">
+    <ion-accordion>
+      <!-- Header (Item) with Expand Arrow -->
+      <ion-item slot="header" detail>
+        <ion-thumbnail slot="start">
+          <ion-img [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/images/rate-sync.png'"></ion-img>
+        </ion-thumbnail>
+        <ion-label>
+          <h3>{{ movie.title }}</h3>
+
+        </ion-label>
+      </ion-item>
+
+      <!-- Accordion Content (Reviews) -->
+      <div slot="content">
+        <ng-container *ngIf="isLoading; else reviewsContent">
+          <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
+        </ng-container>
+        <ng-template #reviewsContent>
+          <!-- Display TMDB Rating -->
+          <ion-item *ngIf="reviews.tmdb">
+            <ion-label>
+              <h3>TMDB</h3>
+              <p>Avaliação: {{ reviews.tmdb.rating | number:'1.1-1' }}</p>
+              <p>Votos: {{ reviews.tmdb.vote_count }}</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- Display OMDB Ratings -->
+          <ion-list *ngIf="reviews.omdb?.length > 0; else noReviews">
+            <ion-item *ngFor="let review of reviews.omdb">
+              <ion-label>
+                <ng-container *ngFor="let key of getReviewKeys(review)">
+                  <h3>{{ review[key].source_name | titlecase }}</h3>
+                  <p>Avaliação: {{ review[key]?.rating }}</p>
+                  <p *ngIf="review[key]?.vote_count">Votos: {{ review[key]?.vote_count }}</p>
+                  <p *ngIf="review[key]?.year">Ano de lançamento: {{ review[key]?.year }}</p>
+                </ng-container>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+
+          <!-- Display Letterboxd Rating -->
+          <ion-item *ngIf="reviews.letterboxd">
+            <ion-label>
+              <h3>Letterboxd</h3>
+              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }}</p>
+              <p>Ano de lançamento: {{ reviews.letterboxd.year }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ng-template #noReviews>
+            <ion-item>
+              <ion-label>Não foram encontradas avaliações.</ion-label>
+            </ion-item>
+          </ng-template>
+        </ng-template>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+</ion-list>

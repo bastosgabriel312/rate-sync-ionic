@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Rate Sync</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <app-search-bar (searchChange)="onSearch($event)" (onSearchCleared)="onSearchClear()"></app-search-bar>
+  <app-movie-list [movies]="movieResults" [isLoading]="isLoadingSearch"></app-movie-list>
+  <ion-content *ngIf="movieResults.length===0">
+    <ion-item>Mais populares</ion-item>
+    <app-movie-list [movies]="moviePopularResults" [isLoading]="isLoadingMorePopulars"></app-movie-list>
+  </ion-content>
+</ion-content>

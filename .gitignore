@@ -9,10 +9,13 @@
 UserInterfaceState.xcuserstate
 $RECYCLE.BIN/
 
+# Logs
 *.log
 log.txt
+npm-debug.log
+yarn-error.log
 
-
+# Source maps, versioning, and coverage
 /.sourcemaps
 /.versions
 /coverage
@@ -29,10 +32,12 @@ log.txt
 /out-tsc
 /bazel-out
 
-# Node
+# Node modules
 /node_modules
-npm-debug.log
-yarn-error.log
+
+# Angular build files
+/.angular
+/.angular/cache
 
 # IDEs and editors
 .idea/
@@ -52,15 +57,11 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-
 # Miscellaneous
-/.angular
-/.angular/cache
 .sass-cache/
 /.nx
 /.nx/cache
 /connect.lock
-/coverage
 /libpeerconnection.log
 testem.log
 /typings
@@ -68,3 +69,27 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Bazel build
+/bazel-out
+
+# Temporary files
+temp/
+.tmp/
+tmp/
+temp/
+*.swp
+
+# Cordova
+merges/
+config.xml
+
+# Android/iOS build artifacts
+*.apk
+*.aab
+*.ipa
+*.app
+*.exe
