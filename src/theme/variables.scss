@@ -1,2 +1,46 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+:root {
+    /* Background and primary colors */
+    --ion-background-color: #0d1117; 
+    --ion-background-color-rgb: 13, 17, 23;
+    --ion-text-color: #c9d1d9; 
+  
+    /* Toolbar (header) */
+    --ion-toolbar-background: #161b22; /* Azul escuro um pouco mais claro */
+    --ion-toolbar-text-color: #c9d1d9; /* Cor do texto na toolbar */
+  
+    /* Buttons and highlights */
+    --ion-color-primary: #238636;
+    --ion-color-primary-rgb: 35, 134, 54;
+  
+    /* Item background */
+    --ion-item-background: #161b22; /* Fundo dos itens */
+    --ion-item-text-color: #c9d1d9; /* Texto dos itens */
+  
+    /* Card */
+    --ion-card-background: #161b22;
+    --ion-card-content-background: #0d1117;
+    --ion-card-color: #c9d1d9;
+  
+    /* Inputs */
+    --ion-input-background-color: #0d1117;
+    --ion-input-color: #c9d1d9;
+    --ion-input-placeholder-color: rgba(201, 209, 217, 0.5);
+  
+    /* Popover, alert, etc. */
+    --ion-popover-background: #161b22;
+    --ion-alert-background: #161b22;
+  
+    /* Shadows and borders */
+    --ion-item-border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .dark {
+    /* Aplicar as mesmas cores para o modo escuro */
+    --ion-background-color: #0d1117;
+    --ion-text-color: #c9d1d9;
+    --ion-toolbar-background: #161b22;
+    --ion-item-background: #161b22;
+    --ion-card-background: #161b22;
+    --ion-popover-background: #161b22;
+  }
+  
