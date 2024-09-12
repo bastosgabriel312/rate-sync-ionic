@@ -38,7 +38,7 @@
                   <h3>{{ review[key].source_name | titlecase }}</h3>
                   <p *ngIf="review[key]?.rating">
                     Avaliação: 
-                    {{ key === 'rotten_tomatoes' || 'metacritic' ? review[key]?.rating + '%' : (review[key]?.rating | number:'1.1-2':'pt') }}
+                    {{ key === 'rotten_tomatoes' ||  key === 'metacritic' ? review[key]?.rating + '%' : (review[key]?.rating | number:'1.1-2':'pt') }}
                     <ion-icon [name]="getRatingIcon(review[key]?.rating, key)" slot="start"></ion-icon>
                   </p>
                   

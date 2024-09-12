@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { PopoverController } from '@ionic/angular';
+import { Platform, PopoverController } from '@ionic/angular';
 import { InfoPopoverComponent } from 'src/app/components/info-popover/info-popover.component';
 import { ApiService } from 'src/app/services/api.service';
 
@@ -14,8 +14,9 @@ export class HomePage {
   isLoadingMorePopulars: boolean = false;
   movieResults: any[] = [];
   moviePopularResults: any[] = [];
+  isAndroid: any;
 
-  constructor(private apiService: ApiService, private popoverController: PopoverController) {
+  constructor(private apiService: ApiService, private popoverController: PopoverController, private platform: Platform) {
     this.apiService.getMovieUpdates().subscribe((data) => {
       try {
         const parsedData = JSON.parse(data);
@@ -32,6 +33,7 @@ export class HomePage {
 
   ngOnInit() {
     this.requestMorePopulars();
+    this.isAndroid = this.platform.is('android');
   }
 
   async onPresentPopover(ev: Event) {
@@ -46,7 +48,7 @@ export class HomePage {
   onSearch(query: string) {
     this.apiService.searchMovies(query);
   }
-  
+
   onSearchClear() {
     this.movieResults = [];
     this.isLoadingSearch = false;
