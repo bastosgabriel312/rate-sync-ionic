@@ -24,7 +24,7 @@
             <ion-label>
               <h3>TMDB</h3>
               <p>Avaliação: {{ reviews.tmdb.rating | number:'1.1-2':'pt' }}
-                <ion-icon [name]="getRatingIcon(reviews.tmdb.rating,'TMDB' )" slot="start" />
+                <span class="material-icons" slot="start">{{ getRatingIcon(reviews.tmdb.rating, 'TMDB') }}</span>
               </p>
               <p>Votos: {{ convertToNumber(reviews.tmdb.vote_count) | number:'1.0-3':'pt'}}</p>
             </ion-label>
@@ -37,11 +37,12 @@
                 <ng-container *ngFor="let key of getReviewKeys(review)">
                   <h3>{{ review[key].source_name | titlecase }}</h3>
                   <p *ngIf="review[key]?.rating">
-                    Avaliação: 
-                    {{ key === 'rotten_tomatoes' ||  key === 'metacritic' ? review[key]?.rating + '%' : (review[key]?.rating | number:'1.1-2':'pt') }}
-                    <ion-icon [name]="getRatingIcon(review[key]?.rating, key)" slot="start"></ion-icon>
+                    Avaliação:
+                    {{ key === 'rotten_tomatoes' || key === 'metacritic' ? review[key]?.rating + '%' :
+                    (review[key]?.rating | number:'1.1-2':'pt') }}
+                    <span class="material-icons" slot="start">{{ getRatingIcon(review[key]?.rating, key) }}</span>
                   </p>
-                  
+
                   <p *ngIf="review[key]?.vote_count">Votos: {{ review[key]?.vote_count | number:'1.0-3':'pt'}}</p>
                   <p *ngIf="review[key]?.year">Ano de lançamento: {{ review[key]?.year }}</p>
                 </ng-container>
@@ -53,8 +54,8 @@
           <ion-item *ngIf="reviews?.letterboxd?.rating">
             <ion-label>
               <h3>Letterboxd</h3>
-              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }} 
-                <ion-icon [name]="getRatingIcon(reviews.letterboxd.rating, 'Letterboxd')" slot="start" />
+              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }}
+                <span class="material-icons" slot="start">{{ getRatingIcon(reviews.letterboxd.rating, 'Letterboxd') }}</span>
               </p>
               <p>Ano de lançamento: {{ reviews.letterboxd.year }}</p>
             </ion-label>
@@ -62,7 +63,9 @@
 
           <ng-template #noReviews>
             <ion-item>
-              <ion-label><p>Não foram encontradas avaliações.</p></ion-label>
+              <ion-label>
+                <p>Não foram encontradas avaliações.</p>
+              </ion-label>
             </ion-item>
           </ng-template>
         </ng-template>

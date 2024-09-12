@@ -50,11 +50,11 @@ export class MovieItemComponent {
     rating = parseFloat(rating)
     console.log(rating >= parameters.max,rating,source)
     if (rating >= parameters.max) {
-      return 'happy-outline';
+      return 'sentiment_very_satisfied';  // Ícone de feliz
     } else if (rating >= parameters.mid) {
-      return 'remove-circle-outline';
+      return 'sentiment_neutral';  // Ícone de neutro
     } else {
-      return 'sad-outline';
+      return 'sentiment_very_dissatisfied';  // Ícone de triste
     }
   }
 
