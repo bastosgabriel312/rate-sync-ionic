@@ -7,6 +7,7 @@ import { MovieItemComponent } from './movie-item/movie-item.component';
 import { MovieListComponent } from './movie-list/movie-list.component';
 import { MovieItemSkeletonComponent } from './movie-item/movie-item-skeleton/movie-item-skeleton.component';
 import { MovieRatingsSkeletonComponent } from './movie-item/movie-ratings-skeleton/movie-ratings-skeleton.component';
+import { InfoPopoverComponent } from './info-popover/info-popover.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { MovieRatingsSkeletonComponent } from './movie-item/movie-ratings-skelet
     MovieItemComponent,
     MovieListComponent,
     MovieItemSkeletonComponent,
-    MovieRatingsSkeletonComponent
+    MovieRatingsSkeletonComponent,
+    InfoPopoverComponent
   ],
   imports: [
     CommonModule,
@@ -26,7 +28,8 @@ import { MovieRatingsSkeletonComponent } from './movie-item/movie-ratings-skelet
     MovieItemComponent,
     MovieListComponent,
     MovieItemSkeletonComponent,
-    MovieRatingsSkeletonComponent
+    MovieRatingsSkeletonComponent,
+    InfoPopoverComponent
   ]
 })
 export class ComponentsModule {}

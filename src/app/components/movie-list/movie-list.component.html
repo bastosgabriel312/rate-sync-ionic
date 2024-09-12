@@ -2,6 +2,13 @@
   <app-movie-item *ngFor="let movie of movies" [movie]="movie"></app-movie-item>
 </ion-list>
 
-<ion-list *ngIf="isLoading">
-  <app-movie-item-skeleton/>
-</ion-list>
+@if (isLoading) {
+  <ion-list>
+    <app-movie-item-skeleton/>
+    <app-movie-item-skeleton/>
+    <app-movie-item-skeleton/>
+    <app-movie-item-skeleton/>
+    <app-movie-item-skeleton/>
+  </ion-list>
+}
+

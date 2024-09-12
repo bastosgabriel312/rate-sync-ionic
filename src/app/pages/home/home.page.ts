@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { PopoverController } from '@ionic/angular';
+import { InfoPopoverComponent } from 'src/app/components/info-popover/info-popover.component';
 import { ApiService } from 'src/app/services/api.service';
 
 
@@ -14,7 +15,7 @@ export class HomePage {
   movieResults: any[] = [];
   moviePopularResults: any[] = [];
 
-  constructor(private apiService: ApiService) {
+  constructor(private apiService: ApiService, private popoverController: PopoverController) {
     this.apiService.getMovieUpdates().subscribe((data) => {
       try {
         const parsedData = JSON.parse(data);
@@ -31,6 +32,15 @@ export class HomePage {
 
   ngOnInit() {
     this.requestMorePopulars();
+  }
+
+  async onPresentPopover(ev: Event) {
+    const popover = await this.popoverController.create({
+      component: InfoPopoverComponent,
+      event: ev,
+      translucent: true,
+    });
+    await popover.present();
   }
 
   onSearch(query: string) {

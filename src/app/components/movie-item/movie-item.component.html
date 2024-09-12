@@ -4,11 +4,11 @@
       <!-- Header (Item) with Expand Arrow -->
       <ion-item slot="header" detail>
         <ion-thumbnail slot="start">
-          <ion-img [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/images/rate-sync.png'"></ion-img>
+          <ion-img
+            [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/images/rate-sync.png'"></ion-img>
         </ion-thumbnail>
         <ion-label>
           <h3>{{ movie.title }}</h3>
-
         </ion-label>
       </ion-item>
 
@@ -18,12 +18,15 @@
           <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
         </ng-container>
         <ng-template #reviewsContent>
+
           <!-- Display TMDB Rating -->
           <ion-item *ngIf="reviews.tmdb">
             <ion-label>
               <h3>TMDB</h3>
-              <p>Avaliação: {{ reviews.tmdb.rating | number:'1.1-1' }}</p>
-              <p>Votos: {{ reviews.tmdb.vote_count }}</p>
+              <p>Avaliação: {{ reviews.tmdb.rating | number:'1.1-2':'pt' }}
+                <ion-icon [name]="getRatingIcon(reviews.tmdb.rating,'TMDB' )" slot="start" />
+              </p>
+              <p>Votos: {{ convertToNumber(reviews.tmdb.vote_count) | number:'1.0-3':'pt'}}</p>
             </ion-label>
           </ion-item>
 
@@ -33,8 +36,13 @@
               <ion-label>
                 <ng-container *ngFor="let key of getReviewKeys(review)">
                   <h3>{{ review[key].source_name | titlecase }}</h3>
-                  <p>Avaliação: {{ review[key]?.rating }}</p>
-                  <p *ngIf="review[key]?.vote_count">Votos: {{ review[key]?.vote_count }}</p>
+                  <p *ngIf="review[key]?.rating">
+                    Avaliação: 
+                    {{ key === 'rotten_tomatoes' || 'metacritic' ? review[key]?.rating + '%' : (review[key]?.rating | number:'1.1-2':'pt') }}
+                    <ion-icon [name]="getRatingIcon(review[key]?.rating, key)" slot="start"></ion-icon>
+                  </p>
+                  
+                  <p *ngIf="review[key]?.vote_count">Votos: {{ review[key]?.vote_count | number:'1.0-3':'pt'}}</p>
                   <p *ngIf="review[key]?.year">Ano de lançamento: {{ review[key]?.year }}</p>
                 </ng-container>
               </ion-label>
@@ -42,17 +50,19 @@
           </ion-list>
 
           <!-- Display Letterboxd Rating -->
-          <ion-item *ngIf="reviews.letterboxd">
+          <ion-item *ngIf="reviews?.letterboxd?.rating">
             <ion-label>
               <h3>Letterboxd</h3>
-              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }}</p>
+              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }} 
+                <ion-icon [name]="getRatingIcon(reviews.letterboxd.rating, 'Letterboxd')" slot="start" />
+              </p>
               <p>Ano de lançamento: {{ reviews.letterboxd.year }}</p>
             </ion-label>
           </ion-item>
 
           <ng-template #noReviews>
             <ion-item>
-              <ion-label>Não foram encontradas avaliações.</ion-label>
+              <ion-label><p>Não foram encontradas avaliações.</p></ion-label>
             </ion-item>
           </ng-template>
         </ng-template>

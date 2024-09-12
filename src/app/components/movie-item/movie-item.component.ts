@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 
 @Component({
@@ -6,15 +6,12 @@ import { ApiService } from 'src/app/services/api.service';
   templateUrl: './movie-item.component.html',
   styleUrls: ['./movie-item.component.scss'],
 })
-export class MovieItemComponent implements OnInit {
+export class MovieItemComponent {
   @Input() movie: any;
   isLoading: boolean = false;
   reviews: any = {};
 
-  constructor(private apiService: ApiService) {}
-
-  ngOnInit() {
-  }
+  constructor(private apiService: ApiService) { }
 
   requestReviews() {
     this.isLoading = true;
@@ -32,7 +29,6 @@ export class MovieItemComponent implements OnInit {
   }
 
   accordionGroupChange(event: any) {
-    // This is called when the accordion is expanded or collapsed
     if (event.detail) {
       this.requestReviews();
     }
@@ -40,4 +36,59 @@ export class MovieItemComponent implements OnInit {
   getReviewKeys(review: any): string[] {
     return Object.keys(review);
   }
+
+  convertToNumber(americanNumber: any): number {
+    const numberAsString = String(americanNumber);
+
+
+    const numberWithoutCommas = numberAsString.replace(/,/g, '');
+    return parseFloat(numberWithoutCommas);
+  }
+
+  getRatingIcon(rating: any, source: string): string {
+    let parameters = this.getSourceRatingParameters(source)
+    rating = parseFloat(rating)
+    console.log(rating >= parameters.max,rating,source)
+    if (rating >= parameters.max) {
+      return 'happy-outline';
+    } else if (rating >= parameters.mid) {
+      return 'remove-circle-outline';
+    } else {
+      return 'sad-outline';
+    }
+  }
+
+  getSourceRatingParameters(source: string) {
+    let min = 0;
+    let mid: number;
+    let max: number;
+
+    switch (source) {
+      case 'imdb': 
+      case 'TMDB':{
+        mid = 5; 
+        max = 7.5;
+        break;
+      }
+      case 'rotten_tomatoes':
+      case 'METACRITIC': {
+        mid = 50;
+        max = 75;   
+        break;
+      }
+      case 'Letterboxd': {
+        mid = 2.5;
+        max = 3.75;   
+        break;
+      }
+      default: {
+        console.warn(`Fonte de avaliação desconhecida: ${source}`);
+        mid = 5; 
+        max = 7.5;    
+        break;
+      }
+    }
+    return { min, mid, max };
+  }
+
 }

@@ -6,7 +6,6 @@ import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
 import { ComponentsModule } from '../../components/components.module';
-import { ApiService } from 'src/app/services/api.service';
 
 
 @NgModule({
