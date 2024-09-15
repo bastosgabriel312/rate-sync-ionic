@@ -3,7 +3,11 @@ p {
     align-items: center;
 }
 
+div ion-item h3, p, span{
+    font-weight: 550 !important;
+}
+
 p span {
     margin-left: 1vmin;
-    font-size: 2vmax;
+    font-size: 2.2vmax;
 }

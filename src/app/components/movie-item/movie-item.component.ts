@@ -48,13 +48,12 @@ export class MovieItemComponent {
   getRatingIcon(rating: any, source: string): string {
     let parameters = this.getSourceRatingParameters(source)
     rating = parseFloat(rating)
-    console.log(rating >= parameters.max,rating,source)
     if (rating >= parameters.max) {
-      return 'sentiment_very_satisfied';  // Ícone de feliz
+      return 'sentiment_very_satisfied'; 
     } else if (rating >= parameters.mid) {
-      return 'sentiment_neutral';  // Ícone de neutro
+      return 'sentiment_neutral';
     } else {
-      return 'sentiment_very_dissatisfied';  // Ícone de triste
+      return 'sentiment_very_dissatisfied';
     }
   }
 
