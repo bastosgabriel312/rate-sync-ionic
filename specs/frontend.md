@@ -94,7 +94,9 @@ isAndroid: any
 - Login com Google
 - Exibição de erros via `ToastService` ou string local
 
-**Dependências:** `AuthService`, `Router`, `ToastService`, `ToolbarComponent` (não declarado em módulo).
+**Dependências:** `AuthService`, `Router`, `ToastService`, `ToolbarComponent`.
+
+**Problema estrutural de módulos:** `login.page.html` utiliza `<app-toolbar>`. O `LoginPageModule` importa `ComponentsModule`, porém `ComponentsModule` não declara nem exporta `ToolbarComponent` (que não pertence a nenhum NgModule). Isso impede a compilação/renderização correta da `LoginPage`.
 
 ---
 
@@ -115,10 +117,10 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 
 ### Não registrados em nenhum NgModule
 
-| Componente | Arquivo | Usado em |
-|---|---|---|
-| `ToolbarComponent` | `components/toolbar/` | `login.page.html` |
-| `UserPopoverComponent` | `components/user-popover/` | Nenhum template identificado |
+| Componente | Arquivo | Usado em | Problema |
+|---|---|---|---|
+| `ToolbarComponent` | `components/toolbar/` | `login.page.html` | Não exportado/declarado em `ComponentsModule`; falha ao renderizar `LoginPage` |
+| `UserPopoverComponent` | `components/user-popover/` | Nenhum template identificado | Componente orfão |
 
 ### Detalhes relevantes
 
@@ -266,7 +268,8 @@ SCSS vazio identificado em: `home.page.scss`, `toolbar.component.scss`.
 | Asset | Status |
 |---|---|
 | `rate-sync-ionic/src/assets/shapes.svg` | Existe |
-| `assets/images/rate-sync.png` | Referenciado em `index.html` e `movie-item.component.html` — **arquivo não encontrado** no diretório `assets/` analisado |
+| `rate-sync-ionic/src/assets/images/rate-sync.png` | Existe (referenciado em `index.html` e `movie-item.component.html` — imagem de fallback com ~1,02 MB) |
+| `rate-sync-ionic/src/assets/icon/favicon.png` | Existe |
 
 ---
 

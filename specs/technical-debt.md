@@ -59,10 +59,10 @@ Código **100% idêntico**. Specs também duplicados. Home importa de `app/servi
 
 ### TD-05: Componentes não registrados em NgModule
 
-| Componente | Usado em | Declarado em |
-|---|---|---|
-| `ToolbarComponent` | `login.page.html` | Nenhum módulo |
-| `UserPopoverComponent` | Nenhum template | Nenhum módulo |
+| Componente | Usado em | Declarado em | Impacto |
+|---|---|---|---|
+| `ToolbarComponent` | `login.page.html` | Nenhum módulo | `login.page.html` consome `<app-toolbar>`. O `LoginPageModule` importa `ComponentsModule`, mas este não declara/exporta `ToolbarComponent`, impedindo a compilação/renderização da `LoginPage`. |
+| `UserPopoverComponent` | Nenhum template | Nenhum módulo | Componente orfão. |
 
 ### TD-06: Interceptor de auth não registrado
 
@@ -136,9 +136,13 @@ Responsabilidade de routing em serviço de auth — acoplamento e risco de loops
 
 `rate-sync/app/main.py` permite apenas `https://ratesync.vercel.app`. Dev local e outros deploys podem falhar.
 
-### TD-17: Asset referenciado ausente
+### TD-17: Imagem de asset com tamanho excessivo (~1 MB)
 
-`assets/images/rate-sync.png` referenciado em `index.html` e `movie-item.component.html`. Apenas `assets/shapes.svg` existe.
+| Aspecto | Detalhe |
+|---|---|
+| **Arquivo** | `rate-sync-ionic/src/assets/images/rate-sync.png` |
+| **Problema** | Imagem PNG não otimizada possui ~1,02 MB (1.026.844 bytes) |
+| **Impacto** | Aumento desnecessário do bundle da aplicação e consumo elevado de dados ao exibir a imagem de fallback |
 
 ### TD-18: `ion-content` aninhado
 
