@@ -1,46 +1,147 @@
 :root {
-    /* Background and primary colors */
-    --ion-background-color: #0d1117; 
-    --ion-background-color-rgb: 13, 17, 23;
-    --ion-text-color: #c9d1d9; 
-  
-    /* Toolbar (header) */
-    --ion-toolbar-background: #161b22; /* Azul escuro um pouco mais claro */
-    --ion-toolbar-text-color: #c9d1d9; /* Cor do texto na toolbar */
-  
-    /* Buttons and highlights */
-    --ion-color-primary: #238636;
-    --ion-color-primary-rgb: 35, 134, 54;
-  
-    /* Item background */
-    --ion-item-background: #161b22; /* Fundo dos itens */
-    --ion-item-text-color: #c9d1d9; /* Texto dos itens */
-  
-    /* Card */
-    --ion-card-background: #161b22;
-    --ion-card-content-background: #0d1117;
-    --ion-card-color: #c9d1d9;
-  
-    /* Inputs */
-    --ion-input-background-color: #0d1117;
-    --ion-input-color: #c9d1d9;
-    --ion-input-placeholder-color: rgba(201, 209, 217, 0.5);
-  
-    /* Popover, alert, etc. */
-    --ion-popover-background: #161b22;
-    --ion-alert-background: #161b22;
-  
-    /* Shadows and borders */
-    --ion-item-border-color: rgba(255, 255, 255, 0.1);
+  /* ============================================================
+     RateSync Design Tokens — Cinematic Dark
+     ============================================================ */
+
+  /* Surfaces (layered) */
+  --rs-color-bg: #0d1117;
+  --rs-color-bg-rgb: 13, 17, 23;
+  --rs-color-surface: #161b22;
+  --rs-color-surface-raised: #1c2128;
+  --rs-color-surface-active: #21262d;
+
+  /* Borders */
+  --rs-color-border: #30363d;
+  --rs-color-border-soft: rgba(240, 246, 252, 0.09);
+
+  /* Text */
+  --rs-text-primary: #e6edf3;
+  --rs-text-secondary: #8b949e;
+  --rs-text-muted: #6e7681;
+
+  /* Brand */
+  --rs-primary: #238636;
+  --rs-primary-rgb: 35, 134, 54;
+  --rs-primary-contrast: #ffffff;
+  --rs-primary-soft: rgba(35, 134, 54, 0.16);
+
+  /* Semantic */
+  --rs-success: #3fb950;
+  --rs-warning: #d29922;
+  --rs-danger: #f85149;
+  --rs-info: #58a6ff;
+
+  /* Type scale */
+  --rs-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --rs-text-xs: 0.75rem;
+  --rs-text-sm: 0.875rem;
+  --rs-text-md: 1rem;
+  --rs-text-lg: 1.125rem;
+  --rs-text-xl: 1.375rem;
+
+  /* Radii & spacing */
+  --rs-radius-sm: 6px;
+  --rs-radius-md: 10px;
+  --rs-radius-lg: 14px;
+  --rs-radius-full: 999px;
+  --rs-space-1: 4px;
+  --rs-space-2: 8px;
+  --rs-space-3: 12px;
+  --rs-space-4: 16px;
+  --rs-space-5: 24px;
+  --rs-space-6: 32px;
+
+  /* ============================================================
+     Ionic CSS variable mapping
+     ============================================================ */
+
+  /* Background & text */
+  --ion-background-color: var(--rs-color-bg);
+  --ion-background-color-rgb: var(--rs-color-bg-rgb);
+  --ion-text-color: var(--rs-text-primary);
+
+  /* Toolbar */
+  --ion-toolbar-background: var(--rs-color-surface);
+  --ion-toolbar-text-color: var(--rs-text-primary);
+
+  /* Brand (primary) */
+  --ion-color-primary: var(--rs-primary);
+  --ion-color-primary-rgb: var(--rs-primary-rgb);
+  --ion-color-primary-contrast: var(--rs-primary-contrast);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #1c6b2b;
+  --ion-color-primary-tint: #3a9a4c;
+
+  /* Semantic colors */
+  --ion-color-success: var(--rs-success);
+  --ion-color-success-rgb: 63, 185, 80;
+  --ion-color-success-contrast: #0d1117;
+  --ion-color-success-contrast-rgb: 13, 17, 23;
+  --ion-color-success-shade: #37a346;
+  --ion-color-success-tint: #52c163;
+
+  --ion-color-warning: var(--rs-warning);
+  --ion-color-warning-rgb: 210, 153, 34;
+  --ion-color-warning-contrast: #0d1117;
+  --ion-color-warning-contrast-rgb: 13, 17, 23;
+  --ion-color-warning-shade: #b8871e;
+  --ion-color-warning-tint: #d7a338;
+
+  --ion-color-danger: var(--rs-danger);
+  --ion-color-danger-rgb: 248, 81, 73;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #db4740;
+  --ion-color-danger-tint: #f9635b;
+
+  --ion-color-info: var(--rs-info);
+  --ion-color-info-rgb: 88, 166, 255;
+  --ion-color-info-contrast: #0d1117;
+  --ion-color-info-contrast-rgb: 13, 17, 23;
+  --ion-color-info-shade: #4d92e0;
+  --ion-color-info-tint: #6bb0ff;
+
+  /* Items */
+  --ion-item-background: var(--rs-color-surface);
+  --ion-item-text-color: var(--rs-text-primary);
+
+  /* Cards */
+  --ion-card-background: var(--rs-color-surface-raised);
+  --ion-card-content-background: var(--rs-color-surface);
+  --ion-card-color: var(--rs-text-primary);
+
+  /* Inputs */
+  --ion-input-background-color: var(--rs-color-bg);
+  --ion-input-color: var(--rs-text-primary);
+  --ion-input-placeholder-color: var(--rs-text-muted);
+
+  /* Overlays */
+  --ion-popover-background: var(--rs-color-surface-raised);
+  --ion-alert-background: var(--rs-color-surface-raised);
+
+  /* Shadows & borders */
+  --ion-item-border-color: var(--rs-color-border-soft);
+  --ion-item-border-radius: var(--rs-radius-md);
+  --ion-card-border-radius: var(--rs-radius-lg);
+
+  /* Searchbar */
+  --ion-searchbar-background: var(--rs-color-surface);
+  --ion-searchbar-input-background: var(--rs-color-bg);
+  --ion-searchbar-input-color: var(--rs-text-primary);
+  --ion-searchbar-placeholder-color: var(--rs-text-muted);
+  --ion-searchbar-color: var(--rs-text-primary);
+  --ion-searchbar-clear-button-color: var(--rs-text-secondary);
+  --ion-searchbar-icon-color: var(--rs-text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  
-  .dark {
-    /* Aplicar as mesmas cores para o modo escuro */
-    --ion-background-color: #0d1117;
-    --ion-text-color: #c9d1d9;
-    --ion-toolbar-background: #161b22;
-    --ion-item-background: #161b22;
-    --ion-card-background: #161b22;
-    --ion-popover-background: #161b22;
-  }
-  
+}

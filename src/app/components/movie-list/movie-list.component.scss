@@ -1,3 +1,19 @@
-ion-list {
-    margin-bottom: 5vmin;
+.rs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--rs-space-3);
+  align-items: start;
+  padding: var(--rs-space-3) var(--rs-space-3) var(--rs-space-5);
+}
+
+@media (min-width: 640px) {
+  .rs-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .rs-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }

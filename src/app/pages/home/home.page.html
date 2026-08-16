@@ -1,23 +1,55 @@
-<ion-header [ngClass]="{'ion-no-border':isAndroid}">
+<ion-header class="ion-no-border rs-header">
   <ion-toolbar>
-    <ion-title>Rate Sync</ion-title>
+    <ion-title class="rs-brand">Rate<span class="rs-brand-accent">Sync</span></ion-title>
     <ion-buttons slot="primary">
-      <ion-button shape="round" size="small" (click)="onPresentPopover($event)">
+      <ion-button shape="round" size="small" aria-label="Sobre o RateSync" (click)="onPresentPopover($event)">
         <ion-icon slot="icon-only" name="information-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar class="rs-search-toolbar">
     <app-search-bar (searchChange)="onSearch($event)" (searchCleared)="onSearchClear()"/>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-  <app-movie-list [movies]="movieResults" [isLoading]="isLoadingSearch"></app-movie-list>
-  @if (movieResults.length === 0) {
-    <div class="ion-padding-top">
-      <ion-item>Mais populares</ion-item>
-      <app-movie-list [movies]="moviePopularResults" [isLoading]="isLoadingMorePopulars"></app-movie-list>
+<ion-content>
+  @if (searchQuery && movieResults.length > 0) {
+    <div class="rs-results-header">
+      <span class="rs-results-count">
+        {{ movieResults.length }} {{ movieResults.length === 1 ? 'filme encontrado' : 'filmes encontrados' }}
+      </span>
     </div>
+  }
+
+  <app-movie-list [movies]="movieResults" [isLoading]="isLoadingSearch"></app-movie-list>
+
+  @if (movieResults.length === 0 && !isLoadingSearch) {
+    @if (searchQuery) {
+      <div class="rs-empty">
+        <ion-icon class="rs-empty__icon" name="film-outline"></ion-icon>
+        <p>Nenhum resultado encontrado para "{{ searchQuery }}".</p>
+      </div>
+    } @else {
+      <div class="rs-section">
+        <ion-item class="rs-section-header" lines="none">
+          <ion-label>Mais populares</ion-label>
+          @if (moviePopularResults.length > 0) {
+            <ion-badge slot="end" color="primary">{{ moviePopularResults.length }}</ion-badge>
+          }
+        </ion-item>
+        @if (popularsError) {
+          <div class="rs-empty">
+            <ion-icon class="rs-empty__icon" name="cloud-offline-outline"></ion-icon>
+            <p>Não foi possível carregar os filmes populares.</p>
+            <ion-button size="small" shape="round" (click)="requestMorePopulars()">
+              <ion-icon slot="start" name="refresh"></ion-icon>
+              Tentar novamente
+            </ion-button>
+          </div>
+        } @else {
+          <app-movie-list [movies]="moviePopularResults" [isLoading]="isLoadingMorePopulars"></app-movie-list>
+        }
+      </div>
+    }
   }
 </ion-content>

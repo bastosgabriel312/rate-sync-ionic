@@ -1,12 +1,9 @@
-<ion-list>
-  <ion-item>
-    <ion-thumbnail slot="start">
-      <ion-skeleton-text [animated]="true"></ion-skeleton-text>
-    </ion-thumbnail>
-    <ion-label>
-      <h3>
-        <ion-skeleton-text [animated]="true" style="width: 80%;"></ion-skeleton-text>
-      </h3>
-    </ion-label>
-  </ion-item>
-</ion-list>
+<div class="rs-card-skeleton">
+  <div class="rs-card-skeleton__poster">
+    <ion-skeleton-text [animated]="true"></ion-skeleton-text>
+  </div>
+  <div class="rs-card-skeleton__body">
+    <ion-skeleton-text [animated]="true" style="width: 85%; height: 14px"></ion-skeleton-text>
+    <ion-skeleton-text [animated]="true" style="width: 55%; height: 12px"></ion-skeleton-text>
+  </div>
+</div>

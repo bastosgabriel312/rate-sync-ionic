@@ -74,8 +74,11 @@ isLoadingSearch: boolean       // ativado em onSearch() (Fase 7)
 isLoadingMorePopulars: boolean
 movieResults: MovieResult[]
 moviePopularResults: MovieResult[]
-isAndroid: any
+searchQuery: string            // termo ativo da busca (estado vazio/contagem, Fase 10)
+popularsError: boolean         // falha ao carregar populares (estado com retry, Fase 10)
 ```
+
+**Fase 10 (2026-08-16):** removida a dependência de `Platform`/`isAndroid` (o `ion-no-border` do header agora é classe estática). Estados adicionados: `searchQuery` (contagem de resultados + empty state de busca) e `popularsError` (mensagem com botão "Tentar novamente" quando `/more_populars` falha).
 
 **Problema estrutural no template:** `ion-content` aninhado em `home.page.html` — **corrigido (Fase 7)** (substituído por `<div>`).
 
@@ -132,8 +135,9 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 **MovieItemComponent** (`movie-item.component.ts`):
 - **Presentacional (Fase 7, TD-09)** — não injeta `ApiService`/`ToastService`
 - Recebe `@Input() movie: MovieResult | undefined`, `@Input() isLoading`, `@Input() reviews`
-- Emite `requestReviews` via `@Output` ao expandir o accordion (título do filme)
-- Lógica de ícones de sentimento por fonte (`getRatingIcon`, `getSourceRatingParameters`)
+- Emite `requestReviews` via `@Output` ao **expandir o card** (Fase 10: `toggle()` substitui o accordion Ionic — emite apenas ao expandir; colapsar não reemite)
+- **Card com poster (Fase 10):** `article.rs-card` com pôster em `aspect-ratio: 2/3`, título, overview (clamp 2 linhas), badge de nota Cinemeta no pôster, chevron de expansão
+- Lógica de ratings por fonte: `formatRating` (escalas corretas — Cinemeta/IMDb `/10`, Rotten Tomatoes `%`, Metacritic `/100`, Letterboxd `/5`), `getRatingTone` (`good`/`neutral`/`bad` → cores semânticas), `getRatingIcon` (ícones de sentimento), `getSourceBadgeSlug` (badges coloridas por fonte)
 - Poster via URL completa (Cinemeta) ou fallback `assets/images/rate-sync.png`
 
 **MovieListComponent** (`movie-list.component.ts`):
@@ -142,7 +146,8 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 - **Cache local de ratings** `reviewsCache: Map<string, MovieRatings>` por título (re-expansão sem nova requisição)
 - `requestReviews(title)` busca via `getMovieRatings` e repassa `[reviews]`/`[isLoading]` ao `MovieItemComponent`
 - Erro de busca de ratings exibe toast via `ToastService`
-- **Skeletons dinâmicos (Fase 8, P-04):** `skeletonItems` gerado a partir de `Platform.height()` (mínimo 3) em vez de 5 itens fixos
+- **Grid responsivo (Fase 10):** template renderiza `.rs-grid` (2 colunas mobile → 4 → 6 desktop) de cards em vez de `ion-list` de linhas
+- **Skeletons dinâmicos (Fases 8/10):** `skeletonItems` gerado a partir de `Platform.height()` (mínimo 3, divisor `280` px estimado para cards)
 - **Cleanup (Fase 8):** subscriptions de ratings rastreadas e desinscritas no `OnDestroy`
 
 **ToolbarComponent** (`toolbar.component.ts`):
@@ -266,11 +271,13 @@ Serviço centralizado de error handling: **não identificado no código analisad
 
 | Arquivo | Conteúdo |
 |---|---|
-| `rate-sync-ionic/src/global.scss` | Imports Ionic CSS, dark mode (3 palettes), overrides globais |
-| `rate-sync-ionic/src/theme/variables.scss` | Paleta dark estilo GitHub (#0d1117, #161b22, primary #238636) |
-| `rate-sync-ionic/src/index.html` | `class="dark"` no body |
+| `rate-sync-ionic/src/global.scss` | Imports Ionic CSS, dark mode (1 palette), tipografia base, scrollbar, foco visível, overrides globais |
+| `rate-sync-ionic/src/theme/variables.scss` | **Design tokens (Fase 10, 2026-08-16):** paleta dark em camadas (`--rs-color-bg/surface/surface-raised/surface-active`), bordas (`--rs-color-border`), texto (`--rs-text-primary/secondary/muted`), semânticas (`--rs-success/warning/danger/info`), escala tipográfica (`--rs-text-xs…xl`), raios/espaçamentos (`--rs-radius-*`, `--rs-space-*`), fonte (`--rs-font-sans`) + mapeamento das variáveis `--ion-*` |
+| `rate-sync-ionic/src/index.html` | `class="dark"` no body; viewport sem `user-scalable=no` (Fase 10, acessibilidade) |
 
-SCSS vazio removido em 2026-08-16: `home.page.scss` e `toolbar.component.scss` deletados (0 bytes); `styleUrls` de `HomePage` e `ToolbarComponent` ajustados.
+**Fase 10 (2026-08-16):** tema redesenhado com design tokens "Cinematic Dark" — surfaces em camadas, cores semânticas para notas/ícones, escala tipográfica em `rem` (eliminados os `vmax`/`vmin`), `prefers-reduced-motion`, scrollbar estilizado e `:focus-visible`. `home.page.scss` recriado (antes removido por ser vazio na Fase 6) para estilizar header/branding/estados.
+
+SCSS vazio removido em 2026-08-16: `home.page.scss` e `toolbar.component.scss` deletados (0 bytes); `styleUrls` de `HomePage` e `ToolbarComponent` ajustados. **Nota (Fase 10):** `home.page.scss` foi recriado com estilos reais.
 
 ---
 

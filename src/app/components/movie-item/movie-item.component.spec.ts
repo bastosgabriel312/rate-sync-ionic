@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AccordionGroupCustomEvent, IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 
 import { MovieItemComponent } from './movie-item.component';
 import { MovieRatings, MovieResult } from 'src/app/core/models/movie.model';
@@ -31,11 +31,29 @@ describe('MovieItemComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('emite requestReviews com o título do filme ao expandir o accordion', () => {
+  it('toggle expandido emite requestReviews com o título do filme', () => {
     spyOn(component.requestReviews, 'emit');
     component.movie = movie;
-    component.accordionGroupChange({ detail: {} } as AccordionGroupCustomEvent);
+    component.toggle();
+    expect(component.expanded).toBeTrue();
     expect(component.requestReviews.emit).toHaveBeenCalledOnceWith('Avatar');
+  });
+
+  it('toggle ao colapsar não reemite requestReviews', () => {
+    spyOn(component.requestReviews, 'emit');
+    component.movie = movie;
+    component.toggle();
+    component.toggle();
+    expect(component.expanded).toBeFalse();
+    expect(component.requestReviews.emit).toHaveBeenCalledTimes(1);
+  });
+
+  it('formatRating aplica a escala correta por fonte', () => {
+    expect(component.formatRating(7.9, 'imdb')).toBe('7.9/10');
+    expect(component.formatRating('81', 'rotten_tomatoes')).toBe('81%');
+    expect(component.formatRating('83', 'metacritic')).toBe('83/100');
+    expect(component.formatRating(4.1, 'Letterboxd')).toBe('4.1/5');
+    expect(component.formatRating(7.8, 'Cinemeta')).toBe('7.8/10');
   });
 
   it('getOmdbReviews retorna array vazio quando omdb não é lista', () => {

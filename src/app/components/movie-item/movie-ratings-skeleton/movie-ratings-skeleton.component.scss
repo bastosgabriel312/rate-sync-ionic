@@ -1,0 +1,16 @@
+.rs-ratings-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rs-space-3);
+}
+
+.rs-ratings-skeleton__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rs-space-2);
+}
+
+.rs-ratings-skeleton ion-skeleton-text {
+  border-radius: var(--rs-radius-sm);
+}

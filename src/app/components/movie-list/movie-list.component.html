@@ -1,15 +1,15 @@
 @if (movies.length > 0 && !isLoading) {
-  <ion-list>
+  <div class="rs-grid">
     @for (movie of movies; track movie) {
       <app-movie-item [movie]="movie" [isLoading]="isLoadingReviews(movie.title)" [reviews]="getReviews(movie.title)" (requestReviews)="requestReviews($event)"></app-movie-item>
     }
-  </ion-list>
+  </div>
 }
 
 @if (isLoading) {
-  <ion-list>
+  <div class="rs-grid">
     @for (item of skeletonItems; track item) {
       <app-movie-item-skeleton/>
     }
-  </ion-list>
+  </div>
 }

@@ -145,7 +145,7 @@ MovieListComponent (container smart) recebe requestReviews (título)
   → Template do MovieItem renderiza cinemeta, omdb, letterboxd
 ```
 
-Cache local `Map<string, MovieRatings>` por título no `MovieListComponent` — re-expansão não refaz requisição (Fase 4). `MovieItemComponent` é **presentacional** (emite `requestReviews` via `@Output`, não injeta serviços) desde a Fase 7 (TD-09).
+Cache local `Map<string, MovieRatings>` por título no `MovieListComponent` — re-expansão não refaz requisição (Fase 4). `MovieItemComponent` é **presentacional** (emite `requestReviews` via `@Output`, não injeta serviços) desde a Fase 7 (TD-09). Desde a **Fase 10**, a expansão usa `toggle()` próprio (card com pôster) em vez do `ion-accordion` — emite `requestReviews` apenas ao expandir.
 
 ### 4. Login (incompleto)
 

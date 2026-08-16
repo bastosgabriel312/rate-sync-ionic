@@ -1,0 +1,13 @@
+ion-searchbar {
+  --border-radius: var(--rs-radius-lg);
+  --box-shadow: none;
+  --background: var(--rs-color-surface-active);
+  --color: var(--rs-text-primary);
+  --placeholder-color: var(--rs-text-muted);
+  --icon-color: var(--rs-text-secondary);
+  --clear-button-color: var(--rs-text-secondary);
+  --cancel-button-color: var(--rs-text-primary);
+  padding-inline: var(--rs-space-3);
+  height: 54px;
+  font-size: var(--rs-text-md);
+}

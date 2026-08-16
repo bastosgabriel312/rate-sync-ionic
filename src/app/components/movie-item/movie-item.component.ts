@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AccordionGroupCustomEvent } from '@ionic/angular';
 import { MovieRatings, MovieResult, MovieRatingEntry } from 'src/app/core/models/movie.model';
 
 @Component({
@@ -13,16 +12,31 @@ export class MovieItemComponent {
   @Input() reviews: MovieRatings | undefined;
   @Output() requestReviews = new EventEmitter<string>();
 
-  accordionGroupChange(event: AccordionGroupCustomEvent) {
-    if (event.detail) {
+  expanded: boolean = false;
+
+  toggle() {
+    if (!this.expanded) {
+      this.expanded = true;
       this.requestReviews.emit(this.movie?.title);
+    } else {
+      this.expanded = false;
     }
   }
+
   getOmdbReviews(): MovieRatingEntry[] {
     return Array.isArray(this.reviews?.omdb) ? this.reviews!.omdb : [];
   }
+
   getReviewKeys(review: MovieRatingEntry): string[] {
     return Object.keys(review);
+  }
+
+  hasAnyRating(): boolean {
+    return (
+      this.reviews?.cinemeta?.rating != null ||
+      this.getOmdbReviews().length > 0 ||
+      this.reviews?.letterboxd?.rating != null
+    );
   }
 
   getRatingIcon(rating: number | string | null | undefined, source: string): string {
@@ -34,6 +48,54 @@ export class MovieItemComponent {
       return 'sentiment_neutral';
     } else {
       return 'sentiment_very_dissatisfied';
+    }
+  }
+
+  getRatingTone(rating: number | string | null | undefined, source: string): string {
+    const parameters = this.getSourceRatingParameters(source);
+    const value = parseFloat(String(rating ?? ''));
+    if (value >= parameters.max) {
+      return 'good';
+    } else if (value >= parameters.mid) {
+      return 'neutral';
+    } else {
+      return 'bad';
+    }
+  }
+
+  formatRating(rating: number | string | null | undefined, source: string): string {
+    const value = Number(rating);
+    if (Number.isNaN(value)) {
+      return String(rating ?? '');
+    }
+    switch (source) {
+      case 'rotten_tomatoes':
+        return `${value}%`;
+      case 'metacritic':
+        return `${value}/100`;
+      case 'Letterboxd':
+        return `${value}/5`;
+      case 'imdb':
+      case 'Cinemeta':
+      default:
+        return `${value}/10`;
+    }
+  }
+
+  getSourceBadgeSlug(source: string): string {
+    switch (source) {
+      case 'imdb':
+        return 'imdb';
+      case 'rotten_tomatoes':
+        return 'rt';
+      case 'metacritic':
+        return 'metacritic';
+      case 'Cinemeta':
+        return 'cinemeta';
+      case 'Letterboxd':
+        return 'letterboxd';
+      default:
+        return 'default';
     }
   }
 

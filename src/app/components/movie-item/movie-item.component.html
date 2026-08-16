@@ -1,90 +1,82 @@
 @if (movie?.title) {
-  <ion-list>
-    <ion-accordion-group (ionChange)="accordionGroupChange($event)">
-      <ion-accordion>
-        <!-- Header (Item) with Expand Arrow -->
-        <ion-item slot="header" detail>
-          <ion-thumbnail slot="start">
-            <ion-img
-              [src]="movie?.poster_path ? movie?.poster_path : 'assets/images/rate-sync.png'"></ion-img>
-          </ion-thumbnail>
-          <ion-label>
-            <h3>{{ movie?.title }}</h3>
-          </ion-label>
-        </ion-item>
+  <article class="rs-card" [class.rs-card--expanded]="expanded">
+    <button
+      type="button"
+      class="rs-card__toggle"
+      (click)="toggle()"
+      [attr.aria-expanded]="expanded"
+      [attr.aria-label]="expanded ? 'Ocultar avaliações de ' + movie!.title : 'Ver avaliações de ' + movie!.title">
+      <span class="rs-card__poster">
+        <img
+          [src]="movie?.poster_path ? movie?.poster_path : 'assets/images/rate-sync.png'"
+          [alt]="'Pôster de ' + movie!.title"
+          loading="lazy"
+          referrerpolicy="no-referrer" />
+        @if (reviews?.cinemeta?.rating !== null && !isLoading) {
+          <span class="rs-card__score">{{ formatRating(reviews!.cinemeta!.rating, 'Cinemeta') }}</span>
+        }
+      </span>
+      <span class="rs-card__body">
+        <span class="rs-card__title">{{ movie!.title }}</span>
+        @if (movie?.overview) {
+          <span class="rs-card__overview">{{ movie!.overview }}</span>
+        }
+      </span>
+      <ion-icon class="rs-card__chevron" [name]="expanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </button>
 
-        <!-- Accordion Content (Reviews) -->
-        <div slot="content">
-          @if (isLoading) {
-            <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
-          } @else {
-
-            <!-- Display Cinemeta Rating -->
-            @if (reviews?.cinemeta) {
-              <ion-item>
-                <ion-label>
-                  <h3>Cinemeta</h3>
-                  <p>Avaliação: {{ reviews?.cinemeta?.rating | number:'1.1-2':'pt' }}
-                    <span class="material-icons" slot="start">{{ getRatingIcon(reviews?.cinemeta?.rating, 'Cinemeta') }}</span>
-                  </p>
-                  @if (reviews?.cinemeta?.year) {
-                    <p>Ano de lançamento: {{ reviews?.cinemeta?.year }}</p>
-                  }
-                </ion-label>
-              </ion-item>
-            }
-
-            <!-- Display OMDB Ratings -->
-            @if (getOmdbReviews().length > 0) {
-              <ion-list>
-                @for (review of getOmdbReviews(); track review) {
-                  <ion-item>
-                    <ion-label>
-                      @for (key of getReviewKeys(review); track key) {
-                        <h3>{{ review[key].source_name | titlecase }}</h3>
-                        @if (review[key].rating) {
-                          <p>
-                            Avaliação:
-                            {{ key === 'rotten_tomatoes' || key === 'metacritic' ? review[key].rating + '%' :
-                            (review[key].rating | number:'1.1-2':'pt') }}
-                            <span class="material-icons" slot="start">{{ getRatingIcon(review[key].rating, key) }}</span>
-                          </p>
-                        }
-
-                        @if (review[key].vote_count) {
-                          <p>Votos: {{ review[key].vote_count | number:'1.0-3':'pt'}}</p>
-                        }
-                        @if (review[key].year) {
-                          <p>Ano de lançamento: {{ review[key].year }}</p>
-                        }
-                      }
-                    </ion-label>
-                  </ion-item>
+    @if (expanded) {
+      <div class="rs-card__content">
+        @if (isLoading) {
+          <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
+        } @else if (hasAnyRating()) {
+          <div class="rs-sources">
+            @if (reviews?.cinemeta?.rating !== null) {
+              <div class="rs-source">
+                <span class="rs-source__badge rs-source__badge--cinemeta">Cinemeta</span>
+                <span class="rs-source__rating">{{ formatRating(reviews!.cinemeta!.rating, 'Cinemeta') }}</span>
+                @if (reviews!.cinemeta!.year) {
+                  <span class="rs-source__meta">{{ reviews!.cinemeta!.year }}</span>
                 }
-              </ion-list>
-            } @else {
-              <ion-item>
-                <ion-label>
-                  <p>Não foram encontradas avaliações.</p>
-                </ion-label>
-              </ion-item>
+                <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.cinemeta!.rating, 'Cinemeta') }}">{{ getRatingIcon(reviews!.cinemeta!.rating, 'Cinemeta') }}</span>
+              </div>
             }
 
-            <!-- Display Letterboxd Rating -->
-            @if (reviews?.letterboxd?.rating) {
-              <ion-item>
-                <ion-label>
-                  <h3>Letterboxd</h3>
-                  <p>Avaliação: {{ reviews?.letterboxd?.rating | number:'1.1-1' }}
-                    <span class="material-icons" slot="start">{{ getRatingIcon(reviews?.letterboxd?.rating, 'Letterboxd') }}</span>
-                  </p>
-                  <p>Ano de lançamento: {{ reviews?.letterboxd?.year }}</p>
-                </ion-label>
-              </ion-item>
+            @for (review of getOmdbReviews(); track review) {
+              @for (key of getReviewKeys(review); track key) {
+                @if (review[key].rating !== null || review[key].vote_count !== null || review[key].year !== null) {
+                  <div class="rs-source">
+                    <span class="rs-source__badge rs-source__badge--{{ getSourceBadgeSlug(key) }}">{{ review[key].source_name | titlecase }}</span>
+                    @if (review[key].rating !== null) {
+                      <span class="rs-source__rating">{{ formatRating(review[key].rating, key) }}</span>
+                    }
+                    @if (review[key].vote_count) {
+                      <span class="rs-source__meta">{{ review[key].vote_count | number:'1.0-0':'pt' }} votos</span>
+                    }
+                    @if (review[key].year) {
+                      <span class="rs-source__meta">{{ review[key].year }}</span>
+                    }
+                    <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(review[key].rating, key) }}">{{ getRatingIcon(review[key].rating, key) }}</span>
+                  </div>
+                }
+              }
             }
-          }
-        </div>
-      </ion-accordion>
-    </ion-accordion-group>
-  </ion-list>
+
+            @if (reviews?.letterboxd?.rating !== null) {
+              <div class="rs-source">
+                <span class="rs-source__badge rs-source__badge--letterboxd">Letterboxd</span>
+                <span class="rs-source__rating">{{ formatRating(reviews!.letterboxd!.rating, 'Letterboxd') }}</span>
+                @if (reviews!.letterboxd!.year) {
+                  <span class="rs-source__meta">{{ reviews!.letterboxd!.year }}</span>
+                }
+                <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.letterboxd!.rating, 'Letterboxd') }}">{{ getRatingIcon(reviews!.letterboxd!.rating, 'Letterboxd') }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="rs-source__note">Nenhuma avaliação encontrada para este filme.</p>
+        }
+      </div>
+    }
+  </article>
 }

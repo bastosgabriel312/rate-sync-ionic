@@ -33,7 +33,7 @@ Documentação da estratégia de testes existente no frontend `rate-sync-ionic/`
 | `toast.service.spec.ts` | `ToastService` | `should be created` |
 | `search-bar.component.spec.ts` | `SearchBarComponent` | Criação + debounce 300ms + clear (Fase 5) |
 | `movie-list.component.spec.ts` | `MovieListComponent` | Criação + fetch/cache de ratings + skeletons dinâmicos (Fases 7–8) |
-| `movie-item.component.spec.ts` | `MovieItemComponent` | Criação + emissão `requestReviews` + parsing OMDB (Fase 7, presentacional) |
+| `movie-item.component.spec.ts` | `MovieItemComponent` | Criação + `toggle` expandido emite `requestReviews` + colapso não reemite + `formatRating` por escala + parsing OMDB (Fase 10, presentacional) |
 | `movie-item-skeleton.component.spec.ts` | `MovieItemSkeletonComponent` | Criação |
 | `movie-ratings-skeleton.component.spec.ts` | `MovieRatingsSkeletonComponent` | Criação |
 | `info-popover.component.spec.ts` | `InfoPopoverComponent` | Criação |
@@ -153,18 +153,20 @@ Lista de fluxos importantes sem spec de comportamento identificado:
 
 ---
 
-## Estado atual da suíte (2026-08-16, Fase 8)
+## Estado atual da suíte (2026-08-16, Fase 10)
 
-`npm test`: **29 specs, 29 SUCCESS** ✅ — suíte totalmente verde.
+`npm test -- --watch=false --browsers=ChromeHeadless`: **31 specs, 31 SUCCESS** ✅ — suíte totalmente verde.
 
 - `ApiService` (8 testes): criação, busca WS, updates, HTTP `more_populars`/`ratings` (com `HttpClientTestingModule` + mock de `WebsocketService`).
 - `HomePage` (3): criação + parsing do WebSocket (lista / erro).
 - `MovieListComponent` (5, Fases 7–8): criação + fetch/cache de ratings por título como container smart + skeletons dinâmicos por viewport.
-- `MovieItemComponent` (4, Fase 7): criação + emissão de `requestReviews` no accordion + parsing OMDB — **presentacional, sem `ApiService`**.
+- `MovieItemComponent` (6, Fase 10): criação + `toggle` expandido emite `requestReviews` + `toggle` ao colapsar não reemite + `formatRating` por escala (imdb `/10`, RT `%`, Metacritic `/100`, Letterboxd `/5`) + parsing OMDB — **presentacional, sem `ApiService`**.
 - `SearchBarComponent` (3): criação + debounce de 300ms + clear imediato.
 - `WebsocketService` (3, Fase 8): criação + conexão **lazy** (P-06) + fila de mensagens até `onopen` (P-03).
 - Demais specs de criação (skeletons, popover).
 
 **Fase 7 (TD-09):** a responsabilidade de busca/cache de ratings migrou de `MovieItemComponent` (smart) para `MovieListComponent` (container) — `HomePage` → `MovieList` → `MovieItem` (presentacional). Specs atualizados conforme o novo contrato de `@Input`/`@Output`.
+
+**Fase 10 (2026-08-16):** `MovieItemComponent` trocou o accordion Ionic por card com `toggle()` próprio (emite `requestReviews` apenas ao expandir); specs de accordion substituídos por testes de `toggle`/`formatRating`.
 
 **Removidos na Fase 5:** specs de `DataService` (serviço removido) e de componentes auth legados `LoginPage`/`Toolbar`/`UserPopover` (compilavam contra Firebase ausente sem valor de cobertura — `NÃO INTEGRAR`).
