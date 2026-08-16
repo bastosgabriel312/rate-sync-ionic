@@ -19,7 +19,7 @@ Fonte: `rate-sync-ionic/package.json`
 | ionicons | `^7.0.0` |
 
 **Testes:** Jasmine + Karma (`rate-sync-ionic/karma.conf.js`)  
-**Lint:** ESLint com `@angular-eslint` (`rate-sync-ionic/.eslintrc.json`)
+**Lint:** ESLint com `@angular-eslint` (`rate-sync-ionic/.eslintrc.json`) — inclui `@typescript-eslint/utils@^8.0.0` (adicionado em 2026-08-16 para destravar o `@angular-eslint/eslint-plugin@18`)
 
 ---
 
@@ -45,7 +45,7 @@ Substituição em build prod configurada em `rate-sync-ionic/angular.json` (`fil
 
 **Configuração Firebase:** não identificado no código analisado (sem apiKey, authDomain, etc. nos environments).
 
-**Capacitor:** `rate-sync-ionic/capacitor.config.ts` — `appId: 'io.ionic.starter'` (valor padrão do scaffold).
+**Capacitor:** `rate-sync-ionic/capacitor.config.ts` — `appId: 'com.bastosgabriel.ratesync'` (definido em 2026-08-16, substituindo o placeholder `io.ionic.starter`).
 
 ---
 
@@ -65,18 +65,19 @@ Substituição em build prod configurada em `rate-sync-ionic/angular.json` (`fil
 - Buscar filmes populares no `ngOnInit`
 - Orquestrar `SearchBarComponent` e `MovieListComponent`
 - Exibir popover informativo (`InfoPopoverComponent`)
+- Exibir toasts de erro de busca/populares via `ToastService` (Fase 4)
 
 **Estado local:**
 
 ```typescript
-isLoadingSearch: boolean       // nunca setado como true em onSearch()
+isLoadingSearch: boolean       // ativado em onSearch() (Fase 7)
 isLoadingMorePopulars: boolean
-movieResults: any[]
-moviePopularResults: any[]
+movieResults: MovieResult[]
+moviePopularResults: MovieResult[]
 isAndroid: any
 ```
 
-**Problema estrutural no template:** `ion-content` aninhado em `home.page.html`.
+**Problema estrutural no template:** `ion-content` aninhado em `home.page.html` — **corrigido (Fase 7)** (substituído por `<div>`).
 
 ---
 
@@ -109,8 +110,8 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 | Componente | Selector | Tipo | Chama API |
 |---|---|---|---|
 | `SearchBarComponent` | `app-search-bar` | Presentacional | Não |
-| `MovieListComponent` | `app-movie-list` | Presentacional | Não |
-| `MovieItemComponent` | `app-movie-item` | Smart | Sim (`getMovieRatings`) |
+| `MovieListComponent` | `app-movie-list` | Container smart (busca/cache de ratings, Fase 7) | Sim (`getMovieRatings`) |
+| `MovieItemComponent` | `app-movie-item` | Presentacional (Fase 7) | Não |
 | `MovieItemSkeletonComponent` | `app-movie-item-skeleton` | Placeholder | Não |
 | `MovieRatingsSkeletonComponent` | `app-movie-ratings-skeleton` | Placeholder | Não |
 | `InfoPopoverComponent` | `app-info-popover` | Informativo | Não |
@@ -125,14 +126,24 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 ### Detalhes relevantes
 
 **SearchBarComponent** (`search-bar.component.ts`):
-- Emite `searchChange` a cada input (sem debounce)
-- Emite `onSearchCleared` ao limpar
+- Emite `searchChange` com **debounce de 300ms** via `Subject` + `debounceTime` (Fase 4)
+- Emite `searchCleared` imediatamente ao limpar
 
 **MovieItemComponent** (`movie-item.component.ts`):
-- Recebe `@Input() movie: any`
-- Busca ratings ao expandir accordion
+- **Presentacional (Fase 7, TD-09)** — não injeta `ApiService`/`ToastService`
+- Recebe `@Input() movie: MovieResult | undefined`, `@Input() isLoading`, `@Input() reviews`
+- Emite `requestReviews` via `@Output` ao expandir o accordion (título do filme)
 - Lógica de ícones de sentimento por fonte (`getRatingIcon`, `getSourceRatingParameters`)
-- Poster via TMDB CDN ou fallback `assets/images/rate-sync.png`
+- Poster via URL completa (Cinemeta) ou fallback `assets/images/rate-sync.png`
+
+**MovieListComponent** (`movie-list.component.ts`):
+- **Container smart (Fase 7, TD-09)** — injeta `ApiService`/`ToastService`
+- Recebe `@Input() movies`, `@Input() isLoading`
+- **Cache local de ratings** `reviewsCache: Map<string, MovieRatings>` por título (re-expansão sem nova requisição)
+- `requestReviews(title)` busca via `getMovieRatings` e repassa `[reviews]`/`[isLoading]` ao `MovieItemComponent`
+- Erro de busca de ratings exibe toast via `ToastService`
+- **Skeletons dinâmicos (Fase 8, P-04):** `skeletonItems` gerado a partir de `Platform.height()` (mínimo 3) em vez de 5 itens fixos
+- **Cleanup (Fase 8):** subscriptions de ratings rastreadas e desinscritas no `OnDestroy`
 
 **ToolbarComponent** (`toolbar.component.ts`):
 - Observa `AuthService.currentUser$`, `userPhoto$`, `displayName$`
@@ -145,17 +156,17 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 
 ### ApiService
 
-**Import usado pela aplicação:** `src/app/services/api.service.ts`  
-**Duplicata:** `src/app/core/services/api.service.ts` (código idêntico)
+**Arquivo oficial (consolidado):** `src/app/core/services/api.service.ts`  
+*(Duplicatas em `src/app/services/` removidas em 2026-08-16)*
 
 | Método | Protocolo | Endpoint |
 |---|---|---|
 | `searchMovies(query)` | WebSocket send | `{apiDomain}/ws/find_movie/` |
 | `getMovieUpdates()` | WebSocket receive | mesmo socket |
 | `getMorePopulars()` | HTTP GET | `{apiDomain}/more_populars` |
-| `getMovieRatings(movie_id)` | HTTP GET | `{apiDomain}/ratings/{movie_id}` |
+| `getMovieRatings(movieId)` | HTTP GET | `{apiDomain}/ratings/{movieId}` |
 
-WebSocket conectado no constructor — conexão única singleton.
+WebSocket conectado de forma **lazy** (Fase 8, P-06): `WebsocketService.connect()` cria o `Subject` sem abrir o socket; a conexão é estabelecida no primeiro subscribe/uso. Mensagens enviadas antes do `onopen` são enfileiradas em `pendingQueue` e despachadas no `onopen` (P-03). O payload é **texto puro** (via `WebsocketService.send(text)`), alinhado ao `receive_text()` do backend. Os DTOs de busca/ratings usam os contratos de `src/app/core/models/movie.model.ts`.
 
 ### AuthService
 
@@ -168,15 +179,9 @@ WebSocket conectado no constructor — conexão única singleton.
 
 ### DataService
 
-**Arquivo:** `rate-sync-ionic/src/app/core/services/data.service.ts`
+**Arquivo:** ~~`rate-sync-ionic/src/app/core/services/data.service.ts`~~ **Removido em 2026-08-16 (Fase 5)**.
 
-| Método | Endpoint |
-|---|---|
-| `getProfile()` | `GET /protected/profile` |
-| `getHello()` | `GET /public/hello` |
-
-**Consumidores:** nenhum identificado no código analisado.  
-**Endpoints no backend:** não identificados no código analisado (`rate-sync/app/api/v1/routes.py`).
+Serviço sem consumidores, chamando endpoints inexistentes (`GET /protected/profile`, `GET /public/hello`). Removido após validação completa (classificação `DESCARTAR APÓS VALIDAÇÃO`).
 
 ### ToastService
 
@@ -184,27 +189,33 @@ WebSocket conectado no constructor — conexão única singleton.
 
 Métodos: `presentToast`, `showErrorToast`, `showSuccessToast`, `showWarningToast`.
 
+**Consumidores (Fase 4/7):** `HomePage` (erro de busca e de filmes populares), `MovieListComponent` (erro ao carregar ratings, Fase 7).
+
+### WebsocketService
+
+**Arquivo oficial (consolidado):** `rate-sync-ionic/src/app/core/services/websocket.service.ts`
+
+- `toWsUrl(url)`: converte `http/https` → `ws/wss` para compatibilidade com a API WebSocket do browser.
+- `connect(url): Subject<string>`: cria o `Subject` sem abrir o socket (**conexão lazy**, Fase 8/P-06); abre no primeiro subscribe/uso.
+- `open(url)`: cria o `WebSocket`, despacha mensagens pendentes (`pendingQueue`) no `onopen` e liga handlers de recepção ao subscriber (**P-03**, Fase 8).
+- `send(data)`: envia **texto puro** (sem `JSON.stringify`), alinhado ao `websocket.receive_text()` do backend; se o socket ainda não está `OPEN`, enfileira em `pendingQueue`.
+
 ---
 
 ## Modelos / interfaces / types
 
-**Não identificado no código analisado.**
-
-Não há pasta `models/`, `interfaces/` ou `types/`. Campos de domínio usam `any`.
-
-Formato de dados inferido dos templates (não formalizado):
+**`src/app/core/models/movie.model.ts`** (criado em 2026-08-16, Fase 3):
 
 ```typescript
-// Filme (busca/populares) — inferido de templates e backend
-{ title: string, overview: string, poster_path: string }
-
-// Ratings — inferido de movie-item.component.html
-{
-  tmdb?: { rating, vote_count },
-  omdb?: Array<Record<string, { source_name, rating, vote_count?, year? }>>,
-  letterboxd?: { rating, year }
-}
+interface MovieResult { title: string; overview: string; poster_path: string; }
+interface MovieError { error: string; }
+interface MovieReviewSource { title?: string; rating?: number | string | null; year?: number | string | null; error?: string; }
+interface MovieRatingDetail { title?: string; movie_title?: string; rating?: number | string | null; vote_count?: number; year?: number | string | null; source_name?: string; }
+interface MovieRatingEntry { [source: string]: MovieRatingDetail; }
+interface MovieRatings { cinemeta: MovieReviewSource; omdb: MovieRatingEntry[] | MovieError; letterboxd: MovieReviewSource; }
 ```
+
+Os DTOs substituem `any` nos contratos de busca e ratings. Campos opcionais refletem a variação de shape entre Cinemeta/OMDb/Letterboxd.
 
 ---
 
@@ -217,7 +228,7 @@ Formato de dados inferido dos templates (não formalizado):
 | Rotas de login | Módulo existe, rota root ausente |
 | Interceptor HTTP | Criado, não registrado |
 | Token em requests | `Authorization: Bearer {token}` (se interceptor ativo) |
-| Endpoints protegidos consumidos | Nenhum (DataService não usado) |
+| Endpoints protegidos consumidos | Nenhum (DataService removido — Fase 5) |
 
 Mensagens de erro mapeadas em `login.page.ts` com códigos Firebase (`auth/user-not-found`, etc.).
 
@@ -230,7 +241,7 @@ Mensagens de erro mapeadas em `login.page.ts` com códigos Firebase (`auth/user-
 | `localStorage` / `sessionStorage` | Não identificado no código analisado |
 | Firebase `browserLocalPersistence` | Configurado em `AuthService` |
 | Cache HTTP | Não identificado no código analisado |
-| Cache de ratings | Não identificado no código analisado |
+| Cache de ratings | `Map<string, MovieRatings>` no `MovieListComponent` (Fases 4/7) |
 | Service Worker / PWA | Não identificado no código analisado |
 
 ---
@@ -241,7 +252,7 @@ Mensagens de erro mapeadas em `login.page.ts` com códigos Firebase (`auth/user-
 |---|---|
 | WebSocket (home) | `try/catch` + `console.error`, limpa `movieResults` |
 | HTTP populares | callback `error` + `console.error` |
-| HTTP ratings | callback `error` + `console.error`, `reviews = {}` |
+| HTTP ratings | callback `error` + `console.error`, cache por título (`MovieListComponent`) |
 | Login | Toast ou string em `this.error` |
 | Auth | `console.error` |
 
@@ -259,7 +270,7 @@ Serviço centralizado de error handling: **não identificado no código analisad
 | `rate-sync-ionic/src/theme/variables.scss` | Paleta dark estilo GitHub (#0d1117, #161b22, primary #238636) |
 | `rate-sync-ionic/src/index.html` | `class="dark"` no body |
 
-SCSS vazio identificado em: `home.page.scss`, `toolbar.component.scss`.
+SCSS vazio removido em 2026-08-16: `home.page.scss` e `toolbar.component.scss` deletados (0 bytes); `styleUrls` de `HomePage` e `ToolbarComponent` ajustados.
 
 ---
 
@@ -268,14 +279,14 @@ SCSS vazio identificado em: `home.page.scss`, `toolbar.component.scss`.
 | Asset | Status |
 |---|---|
 | `rate-sync-ionic/src/assets/shapes.svg` | Existe |
-| `rate-sync-ionic/src/assets/images/rate-sync.png` | Existe (referenciado em `index.html` e `movie-item.component.html` — imagem de fallback com ~1,02 MB) |
+| `rate-sync-ionic/src/assets/images/rate-sync.png` | Existe (referenciado em `index.html` e `movie-item.component.html` — imagem de fallback, **otimizada para ~103 KB em 2026-08-16**, Fase 7) |
 | `rate-sync-ionic/src/assets/icon/favicon.png` | Existe |
 
 ---
 
 ## Dependências Capacitor
 
-Pacotes em `package.json`: `@capacitor/app`, `haptics`, `keyboard`, `status-bar`.
+Pacotes em `package.json`: `@capacitor/app`, `haptics`, `keyboard`, `status-bar` (**mantidos em 2026-08-16** — auto-registrados pelo Capacitor em builds nativos via `package.json`, sem import em `src/`; remoção degradaria um futuro build mobile).
 
 **Uso no código (`src/`):** não identificado no código analisado.
 
@@ -283,6 +294,6 @@ Pacotes em `package.json`: `@capacitor/app`, `haptics`, `keyboard`, `status-bar`
 
 ## Internacionalização
 
-`@angular/localize` incluído nos polyfills (`angular.json`), locale `pt` registrado.
+`@angular/localize` **removido em 2026-08-16** (não havia uso de `$localize`/i18n): retirado dos polyfills (`angular.json`), de `main.ts` e de `tsconfig.app.json`. O locale `pt` permanece registrado via `@angular/common/locales/pt` (usado nos pipes `number`).
 
 Strings i18n (`i18n`, `$localize`): **não identificado no código analisado**. Textos hardcoded em português nos templates.

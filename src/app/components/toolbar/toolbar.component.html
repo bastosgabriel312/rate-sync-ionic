@@ -1,0 +1,24 @@
+<ion-header [ngClass]="{'ion-no-border':isAndroid}">
+  <ion-toolbar>
+    <ion-title>{{ title }}</ion-title>
+    @if (!isLoginPage) {
+    <ion-buttons slot="primary">
+      @if (currentUser) {
+      <ion-button shape="round" size="large">
+        @if (userPhoto) {
+        <ion-img [src]="userPhoto" alt="User photo"/>
+        } @else {
+        <ion-icon name="person"></ion-icon>
+        }
+      </ion-button>
+      } @else {
+      <ion-button shape="round" size="large">
+        <ion-icon name="log-in"></ion-icon>
+      </ion-button>
+      }
+
+    </ion-buttons>
+    }
+
+  </ion-toolbar>
+</ion-header>

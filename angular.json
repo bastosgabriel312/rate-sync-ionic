@@ -17,8 +17,7 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
-              "src/polyfills.ts",
-              "@angular/localize/init"
+              "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -99,8 +98,7 @@
           "options": {
             "main": "src/test.ts",
             "polyfills": [
-              "src/polyfills.ts",
-              "@angular/localize/init"
+              "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",

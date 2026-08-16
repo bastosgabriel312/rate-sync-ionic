@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { ApiService } from 'src/app/services/api.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AccordionGroupCustomEvent } from '@ionic/angular';
+import { MovieRatings, MovieResult, MovieRatingEntry } from 'src/app/core/models/movie.model';
 
 @Component({
   selector: 'app-movie-item',
@@ -7,49 +8,28 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrls: ['./movie-item.component.scss'],
 })
 export class MovieItemComponent {
-  @Input() movie: any;
-  isLoading: boolean = false;
-  reviews: any = {};
+  @Input() movie: MovieResult | undefined;
+  @Input() isLoading: boolean = false;
+  @Input() reviews: MovieRatings | undefined;
+  @Output() requestReviews = new EventEmitter<string>();
 
-  constructor(private apiService: ApiService) { }
-
-  requestReviews() {
-    this.isLoading = true;
-    this.apiService.getMovieRatings(this.movie.title).subscribe({
-      next: (data) => {
-        this.reviews = data;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fetching reviews:', error);
-        this.isLoading = false;
-        this.reviews = {};
-      }
-    });
-  }
-
-  accordionGroupChange(event: any) {
+  accordionGroupChange(event: AccordionGroupCustomEvent) {
     if (event.detail) {
-      this.requestReviews();
+      this.requestReviews.emit(this.movie?.title);
     }
   }
-  getReviewKeys(review: any): string[] {
+  getOmdbReviews(): MovieRatingEntry[] {
+    return Array.isArray(this.reviews?.omdb) ? this.reviews!.omdb : [];
+  }
+  getReviewKeys(review: MovieRatingEntry): string[] {
     return Object.keys(review);
   }
 
-  convertToNumber(americanNumber: any): number {
-    const numberAsString = String(americanNumber);
-
-
-    const numberWithoutCommas = numberAsString.replace(/,/g, '');
-    return parseFloat(numberWithoutCommas);
-  }
-
-  getRatingIcon(rating: any, source: string): string {
+  getRatingIcon(rating: number | string | null | undefined, source: string): string {
     let parameters = this.getSourceRatingParameters(source)
-    rating = parseFloat(rating)
+    rating = parseFloat(String(rating ?? ''))
     if (rating >= parameters.max) {
-      return 'sentiment_very_satisfied'; 
+      return 'sentiment_very_satisfied';
     } else if (rating >= parameters.mid) {
       return 'sentiment_neutral';
     } else {
@@ -63,27 +43,27 @@ export class MovieItemComponent {
     let max: number;
 
     switch (source) {
-      case 'imdb': 
-      case 'TMDB':{
-        mid = 5; 
+      case 'imdb':
+      case 'Cinemeta': {
+        mid = 5;
         max = 7.5;
         break;
       }
       case 'rotten_tomatoes':
       case 'METACRITIC': {
         mid = 50;
-        max = 75;   
+        max = 75;
         break;
       }
       case 'Letterboxd': {
         mid = 2.5;
-        max = 3.75;   
+        max = 3.75;
         break;
       }
       default: {
         console.warn(`Fonte de avaliação desconhecida: ${source}`);
-        mid = 5; 
-        max = 7.5;    
+        mid = 5;
+        max = 7.5;
         break;
       }
     }

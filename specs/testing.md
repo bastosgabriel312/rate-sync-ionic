@@ -27,22 +27,16 @@ Documentação da estratégia de testes existente no frontend `rate-sync-ionic/`
 | Spec | Arquivo testado | Assertions |
 |---|---|---|
 | `app.component.spec.ts` | `AppComponent` | Criação |
-| `home.page.spec.ts` | `HomePage` | Criação |
-| `login.page.spec.ts` | `LoginPage` | Criação |
-| `api.service.spec.ts` | `ApiService` (services/) | `should be created` |
-| `api.service.spec.ts` | `ApiService` (core/services/) | `should be created` |
-| `websocket.service.spec.ts` | `WebsocketService` (services/) | `should be created` |
-| `websocket.service.spec.ts` | `WebsocketService` (core/services/) | `should be created` |
-| `data.service.spec.ts` | `DataService` | `should be created` |
+| `home.page.spec.ts` | `HomePage` | Criação + parsing WS (Fase 5) |
+| `api.service.spec.ts` | `ApiService` (core/services/) | Criação + busca/updates/HTTP — mock de `WebsocketService` + `HttpClientTestingModule` (Fases 4–5) |
+| `websocket.service.spec.ts` | `WebsocketService` (core/services/) | Criação + conexão lazy + fila de mensagens (Fase 8) |
 | `toast.service.spec.ts` | `ToastService` | `should be created` |
-| `search-bar.component.spec.ts` | `SearchBarComponent` | Criação |
-| `movie-list.component.spec.ts` | `MovieListComponent` | Criação |
-| `movie-item.component.spec.ts` | `MovieItemComponent` | Criação |
+| `search-bar.component.spec.ts` | `SearchBarComponent` | Criação + debounce 300ms + clear (Fase 5) |
+| `movie-list.component.spec.ts` | `MovieListComponent` | Criação + fetch/cache de ratings + skeletons dinâmicos (Fases 7–8) |
+| `movie-item.component.spec.ts` | `MovieItemComponent` | Criação + emissão `requestReviews` + parsing OMDB (Fase 7, presentacional) |
 | `movie-item-skeleton.component.spec.ts` | `MovieItemSkeletonComponent` | Criação |
 | `movie-ratings-skeleton.component.spec.ts` | `MovieRatingsSkeletonComponent` | Criação |
 | `info-popover.component.spec.ts` | `InfoPopoverComponent` | Criação |
-| `toolbar.component.spec.ts` | `ToolbarComponent` | Criação |
-| `user-popover.component.spec.ts` | `UserPopoverComponent` | Criação |
 
 **Specs ausentes:**
 
@@ -58,7 +52,7 @@ Documentação da estratégia de testes existente no frontend `rate-sync-ionic/`
 
 ### Services
 
-Exemplo típico (`rate-sync-ionic/src/app/services/api.service.spec.ts`):
+Exemplo típico (`rate-sync-ionic/src/app/core/services/api.service.spec.ts`):
 
 ```typescript
 beforeEach(() => {
@@ -136,10 +130,10 @@ Framework E2E (Cypress, Playwright, Protractor): **não identificado no código 
 
 | # | Problema | Impacto |
 |---|---|---|
-| 1 | Specs duplicados para `ApiService` e `WebsocketService` em duas pastas | Manutenção dobrada |
-| 2 | `HomePage` spec sem mock de `ApiService` | Provável falha ou side effects |
+| 1 | ~~Specs duplicados para `ApiService` e `WebsocketService` em duas pastas~~ **Resolvido (Fase 3)**: duplicatas removidas | Manutenção dobrada |
+| 2 | ~~`HomePage` spec sem mock de `ApiService`~~ **Resolvido (Fase 4)**: mock de `ApiService` + `ToastService` | Provável falha ou side effects |
 | 3 | `LoginPage` spec sem mock de `AuthService` | Provável falha (Firebase ausente) |
-| 4 | `ApiService` spec instancia serviço que abre WebSocket | Teste frágil |
+| 4 | ~~`ApiService` spec instancia serviço que abre WebSocket~~ **Resolvido (Fase 4)**: `WebsocketService` mockado (`connect` → `Subject`) + `HttpClientTestingModule` | Teste frágil |
 | 5 | Zero testes de comportamento funcional | Regressões não detectadas |
 | 6 | Sem testes do interceptor de auth | Wiring não verificado |
 
@@ -150,9 +144,27 @@ Framework E2E (Cypress, Playwright, Protractor): **não identificado no código 
 Lista de fluxos importantes sem spec de comportamento identificado:
 
 1. Parsing de resposta WebSocket em `HomePage` (`JSON.parse`, tratamento de `error`)
-2. Envio de query via WebSocket (`JSON.stringify` vs texto puro)
-3. Fetch de ratings no expand do accordion
+2. ~~Envio de query via WebSocket (`JSON.stringify` vs texto puro)~~ — contrato corrigido (texto puro) em 2026-08-16; spec de `WebsocketService` (core) com mock do `WebSocket` nativo criado em 2026-08-16 (Fase 8): conexão lazy + fila de mensagens
+3. Fetch de ratings no expand do accordion (com cache local por título — Fase 4)
 4. Lógica de ícones de sentimento (`getRatingIcon`, thresholds por fonte)
 5. Mapeamento de erros Firebase em `LoginPage.getErrorMessage()`
 6. Redirect automático em `AuthService` constructor
-7. Emissão de eventos em `SearchBarComponent` (search/clear)
+7. Debounce em `SearchBarComponent` (300ms) — emissão de `searchChange`/`searchCleared`
+
+---
+
+## Estado atual da suíte (2026-08-16, Fase 8)
+
+`npm test`: **29 specs, 29 SUCCESS** ✅ — suíte totalmente verde.
+
+- `ApiService` (8 testes): criação, busca WS, updates, HTTP `more_populars`/`ratings` (com `HttpClientTestingModule` + mock de `WebsocketService`).
+- `HomePage` (3): criação + parsing do WebSocket (lista / erro).
+- `MovieListComponent` (5, Fases 7–8): criação + fetch/cache de ratings por título como container smart + skeletons dinâmicos por viewport.
+- `MovieItemComponent` (4, Fase 7): criação + emissão de `requestReviews` no accordion + parsing OMDB — **presentacional, sem `ApiService`**.
+- `SearchBarComponent` (3): criação + debounce de 300ms + clear imediato.
+- `WebsocketService` (3, Fase 8): criação + conexão **lazy** (P-06) + fila de mensagens até `onopen` (P-03).
+- Demais specs de criação (skeletons, popover).
+
+**Fase 7 (TD-09):** a responsabilidade de busca/cache de ratings migrou de `MovieItemComponent` (smart) para `MovieListComponent` (container) — `HomePage` → `MovieList` → `MovieItem` (presentacional). Specs atualizados conforme o novo contrato de `@Input`/`@Output`.
+
+**Removidos na Fase 5:** specs de `DataService` (serviço removido) e de componentes auth legados `LoginPage`/`Toolbar`/`UserPopover` (compilavam contra Firebase ausente sem valor de cobertura — `NÃO INTEGRAR`).

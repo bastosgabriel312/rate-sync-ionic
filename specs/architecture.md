@@ -6,7 +6,7 @@ Documento descritivo da arquitetura real do frontend RateSync em `rate-sync-ioni
 
 ## Visão geral
 
-O frontend é uma SPA/mobile app construída com **Angular 18 + Ionic 8**, empacotável via **Capacitor 6**. O domínio principal é busca de filmes e exibição de ratings consolidados (TMDB, OMDB, Letterboxd) obtidos via backend FastAPI.
+O frontend é uma SPA/mobile app construída com **Angular 18 + Ionic 8**, empacotável via **Capacitor 6**. O domínio principal é busca de filmes e exibição de ratings consolidados (Cinemeta, OMDB, Letterboxd) obtidos via backend FastAPI.
 
 O repositório contém dois projetos independentes:
 
@@ -67,7 +67,7 @@ Não existe camada explícita de `models/`, `interfaces/`, `store/` ou `shared/`
 
 - **NgModules** clássicos (`AppModule`, feature modules por page).
 - **Lazy loading** apenas para `HomePageModule`.
-- Templates misturam sintaxe legada (`*ngIf`, `*ngFor`) e moderna (`@if`) — migração parcial.
+- Templates usam **sintaxe de blocos Angular 18** (`@if`, `@for`) nos componentes oficiais — padronizado em 2026-08-16; `login.page.html` legado (`*ngIf`) permanece inalterado (`NÃO INTEGRAR`).
 - **Standalone components:** não utilizados.
 - **Strict mode TypeScript:** habilitado em `rate-sync-ionic/tsconfig.json`, mas com uso extensivo de `any` nos componentes.
 
@@ -99,11 +99,11 @@ Não existe camada explícita de `models/`, `interfaces/`, `store/` ou `shared/`
 
 | Serviço | Arquivo(s) | Responsabilidade | Consumido por |
 |---|---|---|---|
-| `ApiService` | `app/services/api.service.ts` **e** `app/core/services/api.service.ts` (idênticos) | HTTP + WebSocket para filmes | `HomePage`, `MovieItemComponent` |
-| `WebsocketService` | `app/services/` **e** `app/core/services/` (idênticos) | Wrapper RxJS sobre WebSocket nativo | `ApiService` |
-| `AuthService` | `app/core/services/auth.service.ts` | Firebase Auth + redirect | `LoginPage`, `ToolbarComponent`, `UserPopoverComponent`, `DataService` |
-| `DataService` | `app/core/services/data.service.ts` | Endpoints protegidos/públicos | **Nenhum consumidor** |
-| `ToastService` | `app/core/services/toast.service.ts` | Toasts Ionic | `LoginPage` |
+| `ApiService` | `app/core/services/api.service.ts` | HTTP + WebSocket para filmes | `HomePage`, `MovieListComponent` |
+| `WebsocketService` | `app/core/services/websocket.service.ts` | Wrapper RxJS sobre WebSocket nativo (contrato WS de texto puro via `toWsUrl()`, conexão lazy no primeiro subscribe, fila de mensagens pendentes até `onopen`) | `ApiService` |
+| `AuthService` | `app/core/services/auth.service.ts` | Firebase Auth + redirect | `LoginPage`, `ToolbarComponent`, `UserPopoverComponent` |
+| ~~`DataService`~~ | ~~`app/core/services/data.service.ts`~~ | ~~Endpoints protegidos/públicos~~ — **Removido (Fase 5)** | Nenhum consumidor |
+| `ToastService` | `app/core/services/toast.service.ts` | Toasts Ionic | `HomePage`, `MovieListComponent`, `LoginPage` |
 
 Todos usam `providedIn: 'root'`.
 
@@ -116,7 +116,7 @@ Todos usam `providedIn: 'root'`.
 ### 1. Busca de filmes (WebSocket)
 
 ```
-SearchBarComponent → HomePage.onSearch()
+SearchBarComponent (debounce 300ms) → HomePage.onSearch()
   → ApiService.searchMovies(query)
   → WebsocketService (Subject)
   → Backend WS /ws/find_movie/
@@ -124,7 +124,7 @@ SearchBarComponent → HomePage.onSearch()
   → MovieListComponent
 ```
 
-Conexão WebSocket é aberta no **constructor** de `ApiService` (singleton no boot).
+Conexão WebSocket é aberta no **constructor** de `ApiService` (singleton no boot). O `SearchBarComponent` aplica `debounceTime(300)` antes de emitir `searchChange` (Fase 4). Desde a **Fase 8**, `WebsocketService.connect()` cria o `Subject` sem abrir o socket — a conexão é estabelecida de forma lazy no primeiro subscribe/uso, e mensagens enviadas antes do `onopen` são enfileiradas (`pendingQueue`) e despachadas assim que o socket abre (P-03/P-06).
 
 ### 2. Mais populares (HTTP)
 
@@ -137,13 +137,15 @@ HomePage.ngOnInit() → ApiService.getMorePopulars()
 ### 3. Ratings por filme (HTTP)
 
 ```
-MovieItemComponent accordion expand
-  → ApiService.getMovieRatings(movie.title)
-  → GET /ratings/{movie_id}
-  → Template renderiza tmdb, omdb, letterboxd
+MovieListComponent (container smart) recebe requestReviews (título)
+  → cache local (reviewsCache) por título
+  → Se cache: usa dados em memória
+  → Senão: ApiService.getMovieRatings(title) → GET /ratings/{movie_id}
+  → Repassa [reviews] e [isLoading] por @Input ao MovieItemComponent
+  → Template do MovieItem renderiza cinemeta, omdb, letterboxd
 ```
 
-Cada expansão refaz a requisição — sem cache.
+Cache local `Map<string, MovieRatings>` por título no `MovieListComponent` — re-expansão não refaz requisição (Fase 4). `MovieItemComponent` é **presentacional** (emite `requestReviews` via `@Output`, não injeta serviços) desde a Fase 7 (TD-09).
 
 ### 4. Login (incompleto)
 
@@ -159,7 +161,7 @@ Fluxo bloqueado por: rota `/login` ausente, Firebase não configurado, intercept
 ## Gerenciamento de estado
 
 - **Biblioteca de state management:** não identificado no código analisado (sem NgRx, Akita, etc.).
-- Estado local em componentes (`HomePage`, `MovieItemComponent`).
+- Estado local em componentes (`HomePage`, `MovieListComponent`).
 - `AuthService` usa `BehaviorSubject` para `currentUser$`, `userPhoto$`, `displayName$`.
 - Sem cache HTTP ou de ratings.
 - Sem `localStorage`/`sessionStorage` explícito (exceto persistência Firebase via `browserLocalPersistence`).
@@ -172,10 +174,10 @@ Fluxo bloqueado por: rota `/login` ausente, Firebase não configurado, intercept
 |---|---|---|
 | Services | `environment.apiDomain` | Configuração |
 | Templates | Shape de resposta do backend | Contrato implícito |
-| `movie-item.component.html` | `https://image.tmdb.org/t/p/w500` | CDN externa |
+| `movie-item.component.html` | `[src]="movie.poster_path"` — URL completa da Cinemeta | Recurso externo |
 | `index.html` | Google Fonts CDN | CDN externa |
 | `AuthService` | Firebase (`@angular/fire`) | Auth (pacotes ausentes) |
-| `DataService` | Endpoints inexistentes no backend | Código morto |
+| ~~`DataService`~~ | ~~Endpoints inexistentes no backend~~ | ~~Código morto~~ — **Removido (Fase 5)** |
 
 ---
 

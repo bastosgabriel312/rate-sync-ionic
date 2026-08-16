@@ -1,75 +1,90 @@
-<ion-list *ngIf="movie?.title">
-  <ion-accordion-group (ionChange)="accordionGroupChange($event)">
-    <ion-accordion>
-      <!-- Header (Item) with Expand Arrow -->
-      <ion-item slot="header" detail>
-        <ion-thumbnail slot="start">
-          <ion-img
-            [src]="movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'assets/images/rate-sync.png'"></ion-img>
-        </ion-thumbnail>
-        <ion-label>
-          <h3>{{ movie.title }}</h3>
-        </ion-label>
-      </ion-item>
+@if (movie?.title) {
+  <ion-list>
+    <ion-accordion-group (ionChange)="accordionGroupChange($event)">
+      <ion-accordion>
+        <!-- Header (Item) with Expand Arrow -->
+        <ion-item slot="header" detail>
+          <ion-thumbnail slot="start">
+            <ion-img
+              [src]="movie?.poster_path ? movie?.poster_path : 'assets/images/rate-sync.png'"></ion-img>
+          </ion-thumbnail>
+          <ion-label>
+            <h3>{{ movie?.title }}</h3>
+          </ion-label>
+        </ion-item>
 
-      <!-- Accordion Content (Reviews) -->
-      <div slot="content">
-        <ng-container *ngIf="isLoading; else reviewsContent">
-          <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
-        </ng-container>
-        <ng-template #reviewsContent>
+        <!-- Accordion Content (Reviews) -->
+        <div slot="content">
+          @if (isLoading) {
+            <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
+          } @else {
 
-          <!-- Display TMDB Rating -->
-          <ion-item *ngIf="reviews.tmdb">
-            <ion-label>
-              <h3>TMDB</h3>
-              <p>Avaliação: {{ reviews.tmdb.rating | number:'1.1-2':'pt' }}
-                <span class="material-icons" slot="start">{{ getRatingIcon(reviews.tmdb.rating, 'TMDB') }}</span>
-              </p>
-              <p>Votos: {{ convertToNumber(reviews.tmdb.vote_count) | number:'1.0-3':'pt'}}</p>
-            </ion-label>
-          </ion-item>
-
-          <!-- Display OMDB Ratings -->
-          <ion-list *ngIf="reviews.omdb?.length > 0; else noReviews">
-            <ion-item *ngFor="let review of reviews.omdb">
-              <ion-label>
-                <ng-container *ngFor="let key of getReviewKeys(review)">
-                  <h3>{{ review[key].source_name | titlecase }}</h3>
-                  <p *ngIf="review[key]?.rating">
-                    Avaliação:
-                    {{ key === 'rotten_tomatoes' || key === 'metacritic' ? review[key]?.rating + '%' :
-                    (review[key]?.rating | number:'1.1-2':'pt') }}
-                    <span class="material-icons" slot="start">{{ getRatingIcon(review[key]?.rating, key) }}</span>
+            <!-- Display Cinemeta Rating -->
+            @if (reviews?.cinemeta) {
+              <ion-item>
+                <ion-label>
+                  <h3>Cinemeta</h3>
+                  <p>Avaliação: {{ reviews?.cinemeta?.rating | number:'1.1-2':'pt' }}
+                    <span class="material-icons" slot="start">{{ getRatingIcon(reviews?.cinemeta?.rating, 'Cinemeta') }}</span>
                   </p>
+                  @if (reviews?.cinemeta?.year) {
+                    <p>Ano de lançamento: {{ reviews?.cinemeta?.year }}</p>
+                  }
+                </ion-label>
+              </ion-item>
+            }
 
-                  <p *ngIf="review[key]?.vote_count">Votos: {{ review[key]?.vote_count | number:'1.0-3':'pt'}}</p>
-                  <p *ngIf="review[key]?.year">Ano de lançamento: {{ review[key]?.year }}</p>
-                </ng-container>
-              </ion-label>
-            </ion-item>
-          </ion-list>
+            <!-- Display OMDB Ratings -->
+            @if (getOmdbReviews().length > 0) {
+              <ion-list>
+                @for (review of getOmdbReviews(); track review) {
+                  <ion-item>
+                    <ion-label>
+                      @for (key of getReviewKeys(review); track key) {
+                        <h3>{{ review[key].source_name | titlecase }}</h3>
+                        @if (review[key].rating) {
+                          <p>
+                            Avaliação:
+                            {{ key === 'rotten_tomatoes' || key === 'metacritic' ? review[key].rating + '%' :
+                            (review[key].rating | number:'1.1-2':'pt') }}
+                            <span class="material-icons" slot="start">{{ getRatingIcon(review[key].rating, key) }}</span>
+                          </p>
+                        }
 
-          <!-- Display Letterboxd Rating -->
-          <ion-item *ngIf="reviews?.letterboxd?.rating">
-            <ion-label>
-              <h3>Letterboxd</h3>
-              <p>Avaliação: {{ reviews.letterboxd.rating | number:'1.1-1' }}
-                <span class="material-icons" slot="start">{{ getRatingIcon(reviews.letterboxd.rating, 'Letterboxd') }}</span>
-              </p>
-              <p>Ano de lançamento: {{ reviews.letterboxd.year }}</p>
-            </ion-label>
-          </ion-item>
+                        @if (review[key].vote_count) {
+                          <p>Votos: {{ review[key].vote_count | number:'1.0-3':'pt'}}</p>
+                        }
+                        @if (review[key].year) {
+                          <p>Ano de lançamento: {{ review[key].year }}</p>
+                        }
+                      }
+                    </ion-label>
+                  </ion-item>
+                }
+              </ion-list>
+            } @else {
+              <ion-item>
+                <ion-label>
+                  <p>Não foram encontradas avaliações.</p>
+                </ion-label>
+              </ion-item>
+            }
 
-          <ng-template #noReviews>
-            <ion-item>
-              <ion-label>
-                <p>Não foram encontradas avaliações.</p>
-              </ion-label>
-            </ion-item>
-          </ng-template>
-        </ng-template>
-      </div>
-    </ion-accordion>
-  </ion-accordion-group>
-</ion-list>
+            <!-- Display Letterboxd Rating -->
+            @if (reviews?.letterboxd?.rating) {
+              <ion-item>
+                <ion-label>
+                  <h3>Letterboxd</h3>
+                  <p>Avaliação: {{ reviews?.letterboxd?.rating | number:'1.1-1' }}
+                    <span class="material-icons" slot="start">{{ getRatingIcon(reviews?.letterboxd?.rating, 'Letterboxd') }}</span>
+                  </p>
+                  <p>Ano de lançamento: {{ reviews?.letterboxd?.year }}</p>
+                </ion-label>
+              </ion-item>
+            }
+          }
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-list>
+}

@@ -8,7 +8,7 @@ Contratos entre o frontend (`rate-sync-ionic/`) e o backend (`rate-sync/`), base
 
 | Ambiente | Arquivo | `apiDomain` |
 |---|---|---|
-| Desenvolvimento | `rate-sync-ionic/src/environments/environment.ts` | `https://localhost:8000/api/v1` |
+| Desenvolvimento | `rate-sync-ionic/src/environments/environment.ts` | `http://localhost:8000/api/v1` |
 | Produção | `rate-sync-ionic/src/environments/environment.prod.ts` | `https://rate-sync-production.up.railway.app/api/v1` |
 
 Todos os serviços HTTP/WebSocket constroem URLs a partir de `environment.apiDomain`.
@@ -24,15 +24,16 @@ Todos os serviços HTTP/WebSocket constroem URLs a partir de `environment.apiDom
 | **Frontend** | `ApiService` → `WebsocketService.connect()` |
 | **URL construída** | `{apiDomain}/ws/find_movie/` |
 | **Backend** | `@router.websocket("/ws/find_movie/")` em `rate-sync/app/api/v1/routes.py` |
-| **Arquivo frontend** | `rate-sync-ionic/src/app/services/api.service.ts` |
+| **Arquivo frontend** | `rate-sync-ionic/src/app/core/services/api.service.ts` |
 
 **Envio (frontend):**
 
 ```typescript
-// websocket.service.ts
-this.ws.send(JSON.stringify(data));
+// core/services/websocket.service.ts — converte http/https para ws/wss via toWsUrl()
+this.ws = new WebSocket(this.toWsUrl(url));
+this.ws.send(data);            // texto puro, sem JSON.stringify
 // data = query string (ex: "avatar")
-// Resultado enviado: '"avatar"' (JSON string com aspas)
+// Resultado enviado: "avatar" (texto UTF-8)
 ```
 
 **Recebimento (backend):**
@@ -63,8 +64,8 @@ this.movieResults = parsedData;
 
 | # | Problema | Frontend | Backend |
 |---|---|---|---|
-| 1 | Scheme WebSocket | URL usa `https://` no construtor `WebSocket` | Requer `ws://` ou `wss://` |
-| 2 | Formato do payload | `JSON.stringify(query)` | `receive_text()` espera texto puro |
+| 1 | Scheme WebSocket | ~~URL usa `https://`~~ → **Corrigido**: `toWsUrl()` converte `http/https` → `ws/wss` | Requer `ws://` ou `wss://` |
+| 2 | Formato do payload | ~~`JSON.stringify(query)`~~ → **Corrigido**: `ws.send(texto)` (texto puro) | `receive_text()` espera texto puro |
 | 3 | Envio enquanto desconectado | Mensagem descartada se `readyState !== OPEN` | N/A |
 
 ---
@@ -78,7 +79,7 @@ this.movieResults = parsedData;
 | **Backend** | `@router.get("/more_populars")` |
 | **Consumidor** | `HomePage.requestMorePopulars()` |
 
-**Resposta esperada pelo backend** (`rate-sync/app/infrastructure/api_clients/tmdb_client.py`):
+**Resposta esperada pelo backend** (`rate-sync/app/infrastructure/api_clients/cinemeta_client.py`):
 
 ```json
 [
@@ -108,11 +109,13 @@ Ou objeto de erro: `{ "error": "string" }`.
 
 ```json
 {
-  "tmdb": { "title", "rating", "vote_count" } | { "error" },
+  "cinemeta": { "title", "rating", "year" } | { "error" },
   "omdb": [ { "imdb": {...} }, { "rotten_tomatoes": {...} }, ... ] | { "error" },
   "letterboxd": { "title", "rating", "year" } | { "error" }
 }
 ```
+
+> **Migração TMDB → Cinemeta:** a chave `tmdb` virou `cinemeta` e `vote_count` não existe mais (a Cinemeta não fornece votos). `rating` = `imdbRating` (0–10). O template `movie-item.component.html` foi atualizado para `reviews.cinemeta` (rating + ano).
 
 **Renderização frontend:** `rate-sync-ionic/src/app/components/movie-item/movie-item.component.html`
 
@@ -120,10 +123,7 @@ Ou objeto de erro: `{ "error": "string" }`.
 
 ## Endpoints referenciados no frontend, ausentes no backend
 
-| Endpoint | Serviço frontend | Backend |
-|---|---|---|
-| `GET /protected/profile` | `DataService.getProfile()` | Não identificado em `rate-sync/app/api/v1/routes.py` |
-| `GET /public/hello` | `DataService.getHello()` | Não identificado em `rate-sync/app/api/v1/routes.py` |
+**Resolvido (2026-08-16, Fase 5):** os únicos consumidores desses endpoints eram o `DataService` (removido — código morto). Não há mais referências no frontend a `/protected/profile` e `/public/hello`.
 
 ---
 
@@ -158,10 +158,10 @@ Ou objeto de erro: `{ "error": "string" }`.
 
 ## CORS
 
-Configuração backend (`rate-sync/app/main.py`):
+Configuração backend (`rate-sync/app/main.py`) — usa `settings.CORS_ORIGINS`:
 
 ```python
-allow_origins=["https://ratesync.vercel.app"]
+allow_origins=["http://localhost:4200", "http://localhost:8100", "https://ratesync.vercel.app"]
 allow_credentials=True
 allow_methods=["*"]
 allow_headers=["*"]
@@ -170,8 +170,8 @@ allow_headers=["*"]
 | Origin | Compatível |
 |---|---|
 | `https://ratesync.vercel.app` | Sim |
-| `http://localhost:4200` (dev Angular) | Não listado |
-| `https://rate-sync-production.up.railway.app` | Não listado |
+| `http://localhost:4200` (dev Angular) | Sim |
+| `http://localhost:8100` (Ionic dev) | Sim |
 
 Proxy de desenvolvimento no frontend: **não identificado no código analisado.**
 
@@ -181,7 +181,7 @@ Proxy de desenvolvimento no frontend: **não identificado no código analisado.*
 
 | Recurso | Onde referenciado |
 |---|---|
-| TMDB CDN | `movie-item.component.html` → `https://image.tmdb.org/t/p/w500{poster_path}` |
+| Poster (URL completa Cinemeta) | `movie-item.component.html` → `[src]="movie.poster_path"` (URL absoluta; sem prefixo de CDN) |
 | Google Fonts | `index.html` → Material Icons |
 | Firebase | `AuthService` (não configurado) |
 
@@ -198,8 +198,7 @@ Proxy de desenvolvimento no frontend: **não identificado no código analisado.*
 │                                                         │
 │  MovieItemComponent ──→ ApiService ──→ GET /ratings/:id │
 │                                                         │
-│  DataService ──→ GET /protected/profile  (sem backend)  │
-│              └──→ GET /public/hello      (sem backend)  │
+│  (DataService removido — 2026-08-16, endpoints inexistentes) │
 │                                                         │
 │  AuthService ──→ Firebase (não integrado ao backend)    │
 └───────────────────────────┬─────────────────────────────┘
@@ -208,9 +207,9 @@ Proxy de desenvolvimento no frontend: **não identificado no código analisado.*
 ┌─────────────────────────────────────────────────────────┐
 │  rate-sync (Backend FastAPI) — prefix /api/v1           │
 │                                                         │
-│  GET  /more_populars     → TMDBClient                   │
-│  GET  /ratings/{id}      → TMDB + OMDB + Letterboxd     │
-│  WS   /ws/find_movie/    → TMDBClient.find_movie        │
+│  GET  /more_populars     → CinemetaClient               │
+│  GET  /ratings/{id}      → Cinemeta + OMDB + Letterboxd  │
+│  WS   /ws/find_movie/    → CinemetaClient.find_movie     │
 │  GET  /movie/            → (não consumido pelo frontend) │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -224,8 +223,8 @@ Definidos em `rate-sync/app/api/v1/schemas.py`:
 ```python
 class MovieRatingResponse(BaseModel):
     omdb: dict
-    tmdb: dict
-    rotten_tomatoes: dict
+    cinemeta: dict
+    letterboxd: dict
 
 class MovieReviewSource(BaseModel):
     title: str

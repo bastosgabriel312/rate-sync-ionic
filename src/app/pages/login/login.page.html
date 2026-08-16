@@ -1,0 +1,45 @@
+<app-toolbar [title]="'Rate Sync'"></app-toolbar>
+<ion-content class="ion-padding">
+  <div class="login-container">
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title class="form-title">{{ showRegister ? 'Criar Conta' : 'LOGIN' }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form (ngSubmit)="showRegister ? register() : loginWithEmail()">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Senha</ion-label>
+            <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" class="ion-margin-top" >
+            {{ showRegister ? 'Registrar' : 'Entrar' }}
+          </ion-button>
+        </form>
+
+        <ion-button expand="block" fill="clear" (click)="showRegister = !showRegister" class="ion-margin-top">
+          {{ showRegister ? 'Já tenho conta' : 'Criar nova conta' }}
+        </ion-button>
+        
+
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="block" (click)="loginWithGoogle()" color="light" class="ion-margin-top">
+      <ion-icon name="logo-google" slot="start"></ion-icon>
+      Entrar com Google
+    </ion-button>
+
+    <ion-text color="danger" *ngIf="error">
+      <p class="ion-text-center">{{ error }}</p>
+    </ion-text>
+  </div>
+</ion-content>
