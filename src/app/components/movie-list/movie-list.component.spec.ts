@@ -62,8 +62,8 @@ describe('MovieListComponent', () => {
     expect(component.isLoadingReviews('Avatar')).toBeFalse();
   });
 
-  it('P-04: skeletonItems é gerado com base na altura da tela (mínimo 3)', () => {
-    expect(component.skeletonItems.length).toBeGreaterThanOrEqual(3);
+  it('P-04: skeletonItems é gerado com base na altura da tela (mínimo 2)', () => {
+    expect(component.skeletonItems.length).toBeGreaterThanOrEqual(2);
     expect(component.skeletonItems[0]).toBe(0);
   });
 });

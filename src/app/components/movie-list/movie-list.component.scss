@@ -1,8 +1,7 @@
 .rs-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: var(--rs-space-3);
-  align-items: start;
+  align-items: stretch;
   padding: var(--rs-space-3) var(--rs-space-3) var(--rs-space-5);
 }
 

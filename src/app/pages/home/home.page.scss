@@ -7,17 +7,6 @@
   font-size: var(--rs-text-xl);
 }
 
-.rs-brand__logo {
-  width: 26px;
-  height: 26px;
-  border-radius: var(--rs-radius-sm);
-  flex-shrink: 0;
-}
-
-.rs-brand-accent {
-  color: var(--rs-primary);
-}
-
 .rs-search-toolbar {
   --min-height: 58px;
   --padding-top: var(--rs-space-1);

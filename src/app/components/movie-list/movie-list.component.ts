@@ -21,8 +21,8 @@ export class MovieListComponent implements OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(private apiService: ApiService, private toastService: ToastService, private platform: Platform) {
-    const itemHeight = 280;
-    const count = Math.max(3, Math.round(this.platform.height() / itemHeight));
+const itemHeight = 320;
+const count = Math.max(2, Math.round(this.platform.height() / itemHeight));
     this.skeletonItems = Array.from({ length: count }, (_, i) => i);
   }
 

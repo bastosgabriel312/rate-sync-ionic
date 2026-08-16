@@ -1,4 +1,6 @@
 .rs-card {
+  display: flex;
+  flex-direction: row;
   background: var(--rs-color-surface);
   border: 1px solid var(--rs-color-border-soft);
   border-radius: var(--rs-radius-lg);
@@ -13,7 +15,7 @@
 
 .rs-card__toggle {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
   padding: 0;
   margin: 0;
@@ -55,7 +57,7 @@
 .rs-card__body {
   padding: var(--rs-space-3);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--rs-space-1);
 }
 
@@ -100,7 +102,7 @@
 
 .rs-sources {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: var(--rs-space-2);
 }
 
@@ -108,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: var(--rs-space-2);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .rs-source__badge {
