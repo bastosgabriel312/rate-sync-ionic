@@ -137,6 +137,7 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 - Recebe `@Input() movie: MovieResult | undefined`, `@Input() isLoading`, `@Input() reviews`
 - Emite `requestReviews` via `@Output` ao **expandir o card** (Fase 10: `toggle()` substitui o accordion Ionic — emite apenas ao expandir; colapsar não reemite)
 - **Card com poster (Fase 10):** `article.rs-card` com pôster em `aspect-ratio: 2/3`, título, overview (clamp 2 linhas), badge de nota Cinemeta no pôster, chevron de expansão
+- **Fontes indisponíveis (Fase 11):** quando uma fonte retorna `error` (ex.: Letterboxd 403), exibe badge + "Indisponível" via `isOmdbError()`/`hasAnySourceData()` em vez de omitir silenciosamente
 - Lógica de ratings por fonte: `formatRating` (escalas corretas — Cinemeta/IMDb `/10`, Rotten Tomatoes `%`, Metacritic `/100`, Letterboxd `/5`), `getRatingTone` (`good`/`neutral`/`bad` → cores semânticas), `getRatingIcon` (ícones de sentimento), `getSourceBadgeSlug` (badges coloridas por fonte)
 - Poster via URL completa (Cinemeta) ou fallback `assets/images/rate-sync.png`
 
@@ -147,6 +148,7 @@ Arquivo: `rate-sync-ionic/src/app/components/components.module.ts`
 - `requestReviews(title)` busca via `getMovieRatings` e repassa `[reviews]`/`[isLoading]` ao `MovieItemComponent`
 - Erro de busca de ratings exibe toast via `ToastService`
 - **Grid responsivo (Fase 10):** template renderiza `.rs-grid` (2 colunas mobile → 4 → 6 desktop) de cards em vez de `ion-list` de linhas
+- **Largura máxima (Fase 11):** container de até 1400px centralizado em telas ≥1024px
 - **Skeletons dinâmicos (Fases 8/10):** `skeletonItems` gerado a partir de `Platform.height()` (mínimo 3, divisor `280` px estimado para cards)
 - **Cleanup (Fase 8):** subscriptions de ratings rastreadas e desinscritas no `OnDestroy`
 
@@ -261,7 +263,7 @@ Mensagens de erro mapeadas em `login.page.ts` com códigos Firebase (`auth/user-
 | Login | Toast ou string em `this.error` |
 | Auth | `console.error` |
 
-Feedback visual ao usuário na home (busca/populares): **não identificado no código analisado** (apenas console).
+Feedback visual ao usuário na home (busca/populares): **implementado (Fases 10–11)** — `.rs-empty` com ícone + botão de retry para erros de populares, "Nenhum filme popular disponível" para lista vazia, "Indisponível" por fonte de rating com `error`, contagem de resultados durante a busca.
 
 Serviço centralizado de error handling: **não identificado no código analisado**.
 
@@ -276,6 +278,8 @@ Serviço centralizado de error handling: **não identificado no código analisad
 | `rate-sync-ionic/src/index.html` | `class="dark"` no body; viewport sem `user-scalable=no` (Fase 10, acessibilidade) |
 
 **Fase 10 (2026-08-16):** tema redesenhado com design tokens "Cinematic Dark" — surfaces em camadas, cores semânticas para notas/ícones, escala tipográfica em `rem` (eliminados os `vmax`/`vmin`), `prefers-reduced-motion`, scrollbar estilizado e `:focus-visible`. `home.page.scss` recriado (antes removido por ser vazio na Fase 6) para estilizar header/branding/estados.
+
+**Fase 11 (2026-08-16):** branding com logo (`assets/images/rate-sync.png`, 26px arredondado) ao lado do wordmark no header; `info-popover.component.scss` criado com identidade visual (logo + título com accent, tipografia e links estilizados); container de largura máxima de 1400px centralizado no grid desktop (≥1024px); estados vazios de populares com ícone ("Nenhum filme popular disponível"); contagem de resultados oculta durante o loading da busca.
 
 SCSS vazio removido em 2026-08-16: `home.page.scss` e `toolbar.component.scss` deletados (0 bytes); `styleUrls` de `HomePage` e `ToolbarComponent` ajustados. **Nota (Fase 10):** `home.page.scss` foi recriado com estilos reais.
 

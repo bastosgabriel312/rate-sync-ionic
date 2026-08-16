@@ -66,4 +66,22 @@ describe('MovieItemComponent', () => {
     component.reviews = { ...ratings, omdb: entries };
     expect(component.getOmdbReviews()).toEqual(entries);
   });
+
+  it('isOmdbError detecta omdb como objeto de erro', () => {
+    component.reviews = { ...ratings, omdb: { error: 'Movie not found' } };
+    expect(component.isOmdbError()).toBeTrue();
+    component.reviews = ratings;
+    expect(component.isOmdbError()).toBeFalse();
+  });
+
+  it('hasAnySourceData considera fontes indisponíveis', () => {
+    const allError: MovieRatings = {
+      cinemeta: { error: 'erro' },
+      omdb: { error: 'erro' },
+      letterboxd: { error: 'erro' },
+    };
+    component.reviews = allError;
+    expect(component.hasAnyRating()).toBeFalse();
+    expect(component.hasAnySourceData()).toBeTrue();
+  });
 });

@@ -29,16 +29,30 @@
       <div class="rs-card__content">
         @if (isLoading) {
           <app-movie-ratings-skeleton></app-movie-ratings-skeleton>
-        } @else if (hasAnyRating()) {
+        } @else if (hasAnySourceData()) {
           <div class="rs-sources">
-            @if (reviews?.cinemeta?.rating !== null) {
-              <div class="rs-source">
-                <span class="rs-source__badge rs-source__badge--cinemeta">Cinemeta</span>
-                <span class="rs-source__rating">{{ formatRating(reviews!.cinemeta!.rating, 'Cinemeta') }}</span>
-                @if (reviews!.cinemeta!.year) {
-                  <span class="rs-source__meta">{{ reviews!.cinemeta!.year }}</span>
-                }
-                <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.cinemeta!.rating, 'Cinemeta') }}">{{ getRatingIcon(reviews!.cinemeta!.rating, 'Cinemeta') }}</span>
+            @if (reviews?.cinemeta) {
+              @if (reviews!.cinemeta.rating !== null) {
+                <div class="rs-source">
+                  <span class="rs-source__badge rs-source__badge--cinemeta">Cinemeta</span>
+                  <span class="rs-source__rating">{{ formatRating(reviews!.cinemeta.rating, 'Cinemeta') }}</span>
+                  @if (reviews!.cinemeta.year) {
+                    <span class="rs-source__meta">{{ reviews!.cinemeta.year }}</span>
+                  }
+                  <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.cinemeta.rating, 'Cinemeta') }}">{{ getRatingIcon(reviews!.cinemeta.rating, 'Cinemeta') }}</span>
+                </div>
+              } @else {
+                <div class="rs-source rs-source--error">
+                  <span class="rs-source__badge rs-source__badge--cinemeta">Cinemeta</span>
+                  <span class="rs-source__meta">Indisponível</span>
+                </div>
+              }
+            }
+
+            @if (isOmdbError()) {
+              <div class="rs-source rs-source--error">
+                <span class="rs-source__badge">OMDb</span>
+                <span class="rs-source__meta">Indisponível</span>
               </div>
             }
 
@@ -62,15 +76,22 @@
               }
             }
 
-            @if (reviews?.letterboxd?.rating !== null) {
-              <div class="rs-source">
-                <span class="rs-source__badge rs-source__badge--letterboxd">Letterboxd</span>
-                <span class="rs-source__rating">{{ formatRating(reviews!.letterboxd!.rating, 'Letterboxd') }}</span>
-                @if (reviews!.letterboxd!.year) {
-                  <span class="rs-source__meta">{{ reviews!.letterboxd!.year }}</span>
-                }
-                <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.letterboxd!.rating, 'Letterboxd') }}">{{ getRatingIcon(reviews!.letterboxd!.rating, 'Letterboxd') }}</span>
-              </div>
+            @if (reviews?.letterboxd) {
+              @if (reviews!.letterboxd.rating !== null) {
+                <div class="rs-source">
+                  <span class="rs-source__badge rs-source__badge--letterboxd">Letterboxd</span>
+                  <span class="rs-source__rating">{{ formatRating(reviews!.letterboxd.rating, 'Letterboxd') }}</span>
+                  @if (reviews!.letterboxd.year) {
+                    <span class="rs-source__meta">{{ reviews!.letterboxd.year }}</span>
+                  }
+                  <span class="material-icons rs-source__tone rs-source__tone--{{ getRatingTone(reviews!.letterboxd.rating, 'Letterboxd') }}">{{ getRatingIcon(reviews!.letterboxd.rating, 'Letterboxd') }}</span>
+                </div>
+              } @else {
+                <div class="rs-source rs-source--error">
+                  <span class="rs-source__badge rs-source__badge--letterboxd">Letterboxd</span>
+                  <span class="rs-source__meta">Indisponível</span>
+                </div>
+              }
             }
           </div>
         } @else {

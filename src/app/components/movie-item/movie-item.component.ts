@@ -39,6 +39,19 @@ export class MovieItemComponent {
     );
   }
 
+  isOmdbError(): boolean {
+    return !!this.reviews?.omdb && !Array.isArray(this.reviews.omdb);
+  }
+
+  hasAnySourceData(): boolean {
+    return (
+      this.hasAnyRating() ||
+      !!this.reviews?.cinemeta?.error ||
+      !!this.reviews?.letterboxd?.error ||
+      this.isOmdbError()
+    );
+  }
+
   getRatingIcon(rating: number | string | null | undefined, source: string): string {
     let parameters = this.getSourceRatingParameters(source)
     rating = parseFloat(String(rating ?? ''))

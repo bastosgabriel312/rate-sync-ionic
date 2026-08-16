@@ -175,6 +175,14 @@
   color: var(--rs-danger);
 }
 
+.rs-source--error {
+  opacity: 0.8;
+}
+
+.rs-source--error .rs-source__badge {
+  filter: grayscale(0.35);
+}
+
 .rs-source__note {
   margin: 0;
   font-size: var(--rs-text-sm);

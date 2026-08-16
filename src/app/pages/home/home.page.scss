@@ -1,7 +1,17 @@
 .rs-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--rs-space-2);
   font-weight: 700;
   letter-spacing: 0.02em;
   font-size: var(--rs-text-xl);
+}
+
+.rs-brand__logo {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--rs-radius-sm);
+  flex-shrink: 0;
 }
 
 .rs-brand-accent {

@@ -15,5 +15,7 @@
 @media (min-width: 1024px) {
   .rs-grid {
     grid-template-columns: repeat(6, 1fr);
+    max-width: 1400px;
+    margin: 0 auto;
   }
 }

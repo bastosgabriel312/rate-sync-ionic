@@ -155,12 +155,12 @@ Lista de fluxos importantes sem spec de comportamento identificado:
 
 ## Estado atual da suíte (2026-08-16, Fase 10)
 
-`npm test -- --watch=false --browsers=ChromeHeadless`: **31 specs, 31 SUCCESS** ✅ — suíte totalmente verde.
+`npm test -- --watch=false --browsers=ChromeHeadless`: **33 specs, 33 SUCCESS** ✅ — suíte totalmente verde.
 
 - `ApiService` (8 testes): criação, busca WS, updates, HTTP `more_populars`/`ratings` (com `HttpClientTestingModule` + mock de `WebsocketService`).
 - `HomePage` (3): criação + parsing do WebSocket (lista / erro).
 - `MovieListComponent` (5, Fases 7–8): criação + fetch/cache de ratings por título como container smart + skeletons dinâmicos por viewport.
-- `MovieItemComponent` (6, Fase 10): criação + `toggle` expandido emite `requestReviews` + `toggle` ao colapsar não reemite + `formatRating` por escala (imdb `/10`, RT `%`, Metacritic `/100`, Letterboxd `/5`) + parsing OMDB — **presentacional, sem `ApiService`**.
+- `MovieItemComponent` (8, Fases 10–11): criação + `toggle` expandido emite `requestReviews` + `toggle` ao colapsar não reemite + `formatRating` por escala (imdb `/10`, RT `%`, Metacritic `/100`, Letterboxd `/5`) + parsing OMDB + `isOmdbError` + `hasAnySourceData` — **presentacional, sem `ApiService`**.
 - `SearchBarComponent` (3): criação + debounce de 300ms + clear imediato.
 - `WebsocketService` (3, Fase 8): criação + conexão **lazy** (P-06) + fila de mensagens até `onopen` (P-03).
 - Demais specs de criação (skeletons, popover).
@@ -168,5 +168,7 @@ Lista de fluxos importantes sem spec de comportamento identificado:
 **Fase 7 (TD-09):** a responsabilidade de busca/cache de ratings migrou de `MovieItemComponent` (smart) para `MovieListComponent` (container) — `HomePage` → `MovieList` → `MovieItem` (presentacional). Specs atualizados conforme o novo contrato de `@Input`/`@Output`.
 
 **Fase 10 (2026-08-16):** `MovieItemComponent` trocou o accordion Ionic por card com `toggle()` próprio (emite `requestReviews` apenas ao expandir); specs de accordion substituídos por testes de `toggle`/`formatRating`.
+
+**Fase 11 (2026-08-16):** adicionados testes de `isOmdbError` e `hasAnySourceData` (estados de fonte indisponível).
 
 **Removidos na Fase 5:** specs de `DataService` (serviço removido) e de componentes auth legados `LoginPage`/`Toolbar`/`UserPopover` (compilavam contra Firebase ausente sem valor de cobertura — `NÃO INTEGRAR`).
