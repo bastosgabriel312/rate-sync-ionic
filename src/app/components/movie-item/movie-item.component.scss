@@ -1,6 +1,4 @@
 .rs-card {
-  display: flex;
-  flex-direction: row;
   background: var(--rs-color-surface);
   border: 1px solid var(--rs-color-border-soft);
   border-radius: var(--rs-radius-lg);
@@ -15,7 +13,7 @@
 
 .rs-card__toggle {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   padding: 0;
   margin: 0;
@@ -57,7 +55,7 @@
 .rs-card__body {
   padding: var(--rs-space-3);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: var(--rs-space-1);
 }
 
@@ -102,7 +100,7 @@
 
 .rs-sources {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: var(--rs-space-2);
 }
 
@@ -110,7 +108,7 @@
   display: flex;
   align-items: center;
   gap: var(--rs-space-2);
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .rs-source__badge {
@@ -175,14 +173,6 @@
 
 .rs-source__tone--bad {
   color: var(--rs-danger);
-}
-
-.rs-source--error {
-  opacity: 0.8;
-}
-
-.rs-source--error .rs-source__badge {
-  filter: grayscale(0.35);
 }
 
 .rs-source__note {
