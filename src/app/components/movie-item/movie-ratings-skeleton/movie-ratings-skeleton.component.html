@@ -1,46 +1,14 @@
-<ion-list>
-  <!-- Skeleton for TMDB Rating -->
-  <ion-item>
-    <ion-label>
-      <h3>
-        <ion-skeleton-text [animated]="true" style="width: 25vmax; height:3vmax"></ion-skeleton-text>
-      </h3>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 15vmax"></ion-skeleton-text>
-      </p>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 10vmax"></ion-skeleton-text>
-      </p>
-    </ion-label>
-  </ion-item>
-
-  <!-- Skeleton for OMDB Ratings -->
-  <ion-item>
-    <ion-label>
-      <h3>
-        <ion-skeleton-text [animated]="true" style="width: 25vmax; height:3vmax"></ion-skeleton-text>
-      </h3>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 15vmax"></ion-skeleton-text>
-      </p>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 10vmax"></ion-skeleton-text>
-      </p>
-    </ion-label>
-  </ion-item>
-
-  <!-- Skeleton for Letterboxd Rating -->
-  <ion-item>
-    <ion-label>
-      <h3>
-        <ion-skeleton-text [animated]="true" style="width: 25vmax; height:3vmax"></ion-skeleton-text>
-      </h3>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 15vmax"></ion-skeleton-text>
-      </p>
-      <p>
-        <ion-skeleton-text [animated]="true" style="width: 10vmax"></ion-skeleton-text>
-      </p>
-    </ion-label>
-  </ion-item>
-</ion-list>
+<div class="rs-ratings-skeleton">
+  <div class="rs-ratings-skeleton__row">
+    <ion-skeleton-text [animated]="true" style="width: 96px; height: 18px"></ion-skeleton-text>
+    <ion-skeleton-text [animated]="true" style="width: 48px; height: 18px"></ion-skeleton-text>
+  </div>
+  <div class="rs-ratings-skeleton__row">
+    <ion-skeleton-text [animated]="true" style="width: 120px; height: 18px"></ion-skeleton-text>
+    <ion-skeleton-text [animated]="true" style="width: 48px; height: 18px"></ion-skeleton-text>
+  </div>
+  <div class="rs-ratings-skeleton__row">
+    <ion-skeleton-text [animated]="true" style="width: 104px; height: 18px"></ion-skeleton-text>
+    <ion-skeleton-text [animated]="true" style="width: 48px; height: 18px"></ion-skeleton-text>
+  </div>
+</div>

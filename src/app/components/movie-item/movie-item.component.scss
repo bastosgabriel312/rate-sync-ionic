@@ -1,13 +1,259 @@
-p {
-    display: flex !important;
+.rs-card {
+  display: flex;
+  flex-direction: column;
+  height: auto; /* allow natural content height so cards aren't excessively tall on small screens */
+  background: var(--rs-color-surface);
+  border: 1px solid var(--rs-color-border-soft);
+  border-radius: var(--rs-radius-lg);
+  overflow: hidden;
+}
+
+.rs-card--expanded {
+  border-color: var(--rs-primary);
+  background: var(--rs-color-surface-raised);
+}
+
+.rs-card__toggle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.rs-card__poster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: var(--rs-color-bg);
+  overflow: hidden;
+}
+
+.rs-card__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rs-card__score {
+  position: absolute;
+  bottom: var(--rs-space-2);
+  right: var(--rs-space-2);
+  background: rgba(13, 17, 23, 0.85);
+  color: var(--rs-success);
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--rs-radius-full);
+  font-size: var(--rs-text-sm);
+}
+
+.rs-card__body {
+  flex: 1;
+  padding: var(--rs-space-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--rs-space-1);
+}
+
+.rs-card__title {
+  font-size: var(--rs-text-md);
+  font-weight: 600;
+  color: var(--rs-text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rs-card__overview {
+  font-size: var(--rs-text-sm);
+  color: var(--rs-text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rs-card__chevron {
+  position: absolute;
+  top: var(--rs-space-2);
+  right: var(--rs-space-2);
+  color: var(--rs-text-primary);
+  font-size: 1.3rem;
+  background: rgba(13, 17, 23, 0.6);
+  border-radius: var(--rs-radius-full);
+  padding: 2px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rs-card__content {
+  padding: var(--rs-space-3);
+  border-top: 1px solid var(--rs-color-border-soft);
+}
+
+.rs-sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rs-space-2);
+}
+
+.rs-source {
+  display: flex;
+  align-items: center;
+  gap: var(--rs-space-1) var(--rs-space-2);
+  flex-wrap: nowrap; /* keep tone icon on same row as rating */
+  min-width: 0;
+}
+
+.rs-source__rating,
+.rs-source__meta {
+  min-width: 0; /* allow truncation inside flex */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rs-source__badge {
+  font-size: var(--rs-text-xs);
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--rs-radius-full);
+  color: var(--rs-text-primary);
+  background: var(--rs-color-surface-active);
+  border: 1px solid var(--rs-color-border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+  .rs-source {
+    display: grid;
+    /* badge | info (rating + meta) | tone */
+    grid-template-columns: auto 1fr auto;
     align-items: center;
+    row-gap: var(--rs-space-1);
+    column-gap: var(--rs-space-2);
+  }
+
+  .rs-source__badge {
+    font-size: 0.625rem;
+  }
+
+  .rs-source__info {
+    display: flex;
+    flex-direction: row; /* keep rating and vote count on same line */
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+
+  .rs-source__rating {
+    flex: 0 0 auto;
+  }
+
+  .rs-source__meta {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rs-source__rating,
+  .rs-source__meta {
+    font-size: 0.6875rem;
+  }
+
+  .rs-source__tone {
+    margin-left: 0;
+    justify-self: end;
+    align-self: start; /* align with the top of rating/info so icon sits beside the rating */
+  }
+
+  /* reduce poster height and padding on small screens so cards don't become excessively tall */
+  .rs-card__poster {
+    aspect-ratio: 2 / 3;
+    max-height: 200px;
+    overflow: hidden;
+  }
+
+  .rs-card__body {
+    padding: var(--rs-space-2);
+  }
 }
 
-div ion-item h3, p, span{
-    font-weight: 550 !important;
+.rs-source__badge--cinemeta,
+.rs-source__badge--letterboxd {
+  background: var(--rs-primary-soft);
+  border-color: var(--rs-primary);
+  color: var(--rs-primary-contrast);
 }
 
-p span {
-    margin-left: 1vmin;
-    font-size: 2.2vmax;
+.rs-source__badge--imdb {
+  background: rgba(210, 153, 34, 0.15);
+  border-color: var(--rs-warning);
+  color: var(--rs-warning);
+}
+
+.rs-source__badge--rt {
+  background: rgba(248, 81, 73, 0.15);
+  border-color: var(--rs-danger);
+  color: var(--rs-danger);
+}
+
+.rs-source__badge--metacritic {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: var(--rs-info);
+  color: var(--rs-info);
+}
+
+.rs-source__rating {
+  font-size: var(--rs-text-sm);
+  font-weight: 700;
+  color: var(--rs-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rs-source__meta {
+  font-size: 0.6875rem;
+  color: var(--rs-text-muted);
+  white-space: nowrap;
+}
+
+.rs-source__tone {
+  margin-left: auto;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.rs-source__tone--good {
+  color: var(--rs-success);
+}
+
+.rs-source__tone--neutral {
+  color: var(--rs-warning);
+}
+
+.rs-source__tone--bad {
+  color: var(--rs-danger);
+}
+
+.rs-source__note {
+  margin: 0;
+  font-size: var(--rs-text-sm);
+  color: var(--rs-text-secondary);
+  text-align: center;
 }

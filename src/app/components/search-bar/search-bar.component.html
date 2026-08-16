@@ -1,6 +1,7 @@
-<ion-searchbar 
-  [(ngModel)]="query" 
+<ion-searchbar
+  [(ngModel)]="query"
   (ionInput)="onSearchChange($event)"
-  (ionClear)="onSearchClear($event)"
-  placeholder="Pesquisar">
+  (ionClear)="onSearchClear()"
+  placeholder="Pesquisar filmes"
+  aria-label="Pesquisar filmes">
 </ion-searchbar>

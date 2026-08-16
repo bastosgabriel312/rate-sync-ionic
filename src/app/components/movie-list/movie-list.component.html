@@ -1,14 +1,15 @@
-<ion-list *ngIf="movies.length > 0 && !isLoading">
-  <app-movie-item *ngFor="let movie of movies" [movie]="movie"></app-movie-item>
-</ion-list>
-
-@if (isLoading) {
-  <ion-list>
-    <app-movie-item-skeleton/>
-    <app-movie-item-skeleton/>
-    <app-movie-item-skeleton/>
-    <app-movie-item-skeleton/>
-    <app-movie-item-skeleton/>
-  </ion-list>
+@if (movies.length > 0 && !isLoading) {
+  <div class="rs-grid">
+    @for (movie of movies; track movie) {
+      <app-movie-item [movie]="movie" [isLoading]="isLoadingReviews(movie.title)" [reviews]="getReviews(movie.title)" (requestReviews)="requestReviews($event)"></app-movie-item>
+    }
+  </div>
 }
 
+@if (isLoading) {
+  <div class="rs-grid">
+    @for (item of skeletonItems; track item) {
+      <app-movie-item-skeleton/>
+    }
+  </div>
+}

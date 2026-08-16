@@ -33,42 +33,88 @@
  */
 
 @import "@ionic/angular/css/palettes/dark.always.css";
-@import "@ionic/angular/css/palettes/dark.class.css"; 
-@import "@ionic/angular/css/palettes/dark.system.css";
 
+/* ============================================================
+   Base typography
+   ============================================================ */
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 
 body {
-    background-color: var(--ion-background-color);
-    color: var(--ion-text-color);
-  }
-  
-  ion-header, ion-toolbar {
-    --background: var(--ion-toolbar-background);
-    --color: var(--ion-toolbar-text-color);
-  }
-  
-  ion-content {
-    --background: var(--ion-background-color);
-  }
-  
-  ion-item {
-    --background: var(--ion-item-background);
-    --color: var(--ion-item-text-color);
-  }
-  
-  ion-card {
-    --background: var(--ion-card-background);
-    --color: var(--ion-card-color);
-  }
-  
-  ion-input {
-    --background: var(--ion-input-background-color);
-    --color: var(--ion-input-color);
-    --placeholder-color: var(--ion-input-placeholder-color);
-  }
-  
-  ion-button {
-    --background: var(--ion-color-primary);
-    --color: #fff;
-  }
-  
+  font-family: var(--rs-font-sans);
+  background-color: var(--ion-background-color);
+  color: var(--ion-text-color);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Scrollbar (desktop)
+   ============================================================ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rs-color-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--rs-color-border);
+  border-radius: var(--rs-radius-full);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ============================================================
+   Ionic component defaults
+   ============================================================ */
+
+ion-header,
+ion-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-toolbar-text-color);
+}
+
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+ion-item {
+  --background: var(--ion-item-background);
+  --color: var(--ion-item-text-color);
+}
+
+ion-card {
+  --background: var(--ion-card-background);
+  --color: var(--ion-card-color);
+}
+
+ion-input {
+  --background: var(--ion-input-background-color);
+  --color: var(--ion-input-color);
+  --placeholder-color: var(--ion-input-placeholder-color);
+}
+
+ion-button {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+/* ============================================================
+   Focus visibility (accessibility)
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--rs-primary);
+  outline-offset: 2px;
+  border-radius: var(--rs-radius-sm);
+}
