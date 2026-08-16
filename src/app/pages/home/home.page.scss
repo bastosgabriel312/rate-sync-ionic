@@ -7,6 +7,10 @@
   font-size: var(--rs-text-xl);
 }
 
+.rs-brand-accent {
+  color: var(--rs-success); /* use default green success color for "Sync" */
+}
+
 .rs-search-toolbar {
   --min-height: 58px;
   --padding-top: var(--rs-space-1);

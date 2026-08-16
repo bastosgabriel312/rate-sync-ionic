@@ -1,19 +1,29 @@
 .rs-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: auto; /* allow cards to size to their content instead of forcing equal tall rows */
   gap: var(--rs-space-3);
   align-items: start;
+  justify-items: stretch;
   padding: var(--rs-space-3) var(--rs-space-3) var(--rs-space-5);
+}
+
+@media (max-width: 420px) {
+  .rs-grid {
+    grid-template-columns: 1fr;
+    gap: var(--rs-space-2);
+    padding: var(--rs-space-2) var(--rs-space-2) var(--rs-space-4);
+  }
 }
 
 @media (min-width: 640px) {
   .rs-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .rs-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }

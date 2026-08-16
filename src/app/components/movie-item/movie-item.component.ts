@@ -28,7 +28,22 @@ export class MovieItemComponent {
   }
 
   getReviewKeys(review: MovieRatingEntry): string[] {
-    return Object.keys(review);
+    return Object.keys(review).sort((a, b) => this.getSourcePriority(a) - this.getSourcePriority(b));
+  }
+
+  getSourcePriority(source: string): number {
+    switch (source.toLowerCase()) {
+      case 'letterboxd':
+        return 0;
+      case 'rotten_tomatoes':
+        return 1;
+      case 'metacritic':
+        return 2;
+      case 'imdb':
+        return 3;
+      default:
+        return 4;
+    }
   }
 
   hasAnyRating(): boolean {
@@ -53,8 +68,8 @@ export class MovieItemComponent {
   }
 
   getRatingIcon(rating: number | string | null | undefined, source: string): string {
-    let parameters = this.getSourceRatingParameters(source)
-    rating = parseFloat(String(rating ?? ''))
+    const parameters = this.getSourceRatingParameters(source);
+    rating = parseFloat(String(rating ?? ''));
     if (rating >= parameters.max) {
       return 'sentiment_very_satisfied';
     } else if (rating >= parameters.mid) {
@@ -81,31 +96,32 @@ export class MovieItemComponent {
     if (Number.isNaN(value)) {
       return String(rating ?? '');
     }
-    switch (source) {
+
+    switch (String(source ?? '').toLowerCase()) {
       case 'rotten_tomatoes':
         return `${value}%`;
       case 'metacritic':
         return `${value}/100`;
-      case 'Letterboxd':
+      case 'letterboxd':
         return `${value}/5`;
       case 'imdb':
-      case 'Cinemeta':
+      case 'cinemeta':
       default:
         return `${value}/10`;
     }
   }
 
   getSourceBadgeSlug(source: string): string {
-    switch (source) {
+    switch (source.toLowerCase()) {
       case 'imdb':
         return 'imdb';
       case 'rotten_tomatoes':
         return 'rt';
       case 'metacritic':
         return 'metacritic';
-      case 'Cinemeta':
+      case 'cinemeta':
         return 'cinemeta';
-      case 'Letterboxd':
+      case 'letterboxd':
         return 'letterboxd';
       default:
         return 'default';
@@ -113,24 +129,25 @@ export class MovieItemComponent {
   }
 
   getSourceRatingParameters(source: string) {
+    const normalizedSource = String(source ?? '').toLowerCase();
     let min = 0;
     let mid: number;
     let max: number;
 
-    switch (source) {
+    switch (normalizedSource) {
       case 'imdb':
-      case 'Cinemeta': {
+      case 'cinemeta': {
         mid = 5;
         max = 7.5;
         break;
       }
       case 'rotten_tomatoes':
-      case 'METACRITIC': {
+      case 'metacritic': {
         mid = 50;
         max = 75;
         break;
       }
-      case 'Letterboxd': {
+      case 'letterboxd': {
         mid = 2.5;
         max = 3.75;
         break;

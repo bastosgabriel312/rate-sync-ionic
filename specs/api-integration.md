@@ -66,7 +66,7 @@ this.movieResults = parsedData;
 |---|---|---|---|
 | 1 | Scheme WebSocket | ~~URL usa `https://`~~ → **Corrigido**: `toWsUrl()` converte `http/https` → `ws/wss` | Requer `ws://` ou `wss://` |
 | 2 | Formato do payload | ~~`JSON.stringify(query)`~~ → **Corrigido**: `ws.send(texto)` (texto puro) | `receive_text()` espera texto puro |
-| 3 | Envio enquanto desconectado | Mensagem descartada se `readyState !== OPEN` | N/A |
+| 3 | Envio enquanto desconectado | Mensagem enfileirada e enviada após reconexão (client) | N/A |
 
 ---
 

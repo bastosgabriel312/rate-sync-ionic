@@ -1,9 +1,11 @@
 .rs-card-skeleton {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: var(--rs-color-surface);
   border: 1px solid var(--rs-color-border-soft);
   border-radius: var(--rs-radius-lg);
   overflow: hidden;
-  height: 100%;
 }
 
 .rs-card-skeleton__poster {
@@ -20,7 +22,9 @@
 
 .rs-card-skeleton__body {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
   gap: var(--rs-space-2);
   padding: var(--rs-space-3);
 }

@@ -1,5 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PopoverController } from '@ionic/angular';
+import { PopoverController, ModalController } from '@ionic/angular';
+import { DevMetricsComponent } from 'src/app/components/dev-metrics/dev-metrics.component';
+import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
 import { InfoPopoverComponent } from 'src/app/components/info-popover/info-popover.component';
 import { ApiService } from 'src/app/core/services/api.service';
@@ -22,7 +24,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private apiService: ApiService, private popoverController: PopoverController, private toastService: ToastService) {
+  isDev = !environment.production;
+
+  constructor(private apiService: ApiService, private popoverController: PopoverController, private toastService: ToastService, private modalController: ModalController) {
     this.subscriptions.push(this.apiService.getMovieUpdates().subscribe((data) => {
       try {
         const parsedData = JSON.parse(data) as MovieResult[] | MovieError;
@@ -83,5 +87,19 @@ export class HomePage implements OnInit, OnDestroy {
         this.toastService.showErrorToast('Não foi possível carregar os filmes populares.');
       }
     }));
+  }
+
+  async showMetrics() {
+    if (!this.isDev) return;
+    try {
+      const modal = await this.modalController.create({
+        component: DevMetricsComponent,
+        cssClass: 'dev-metrics-modal'
+      });
+      await modal.present();
+    } catch (err) {
+      console.error('Error opening metrics modal:', err);
+      this.toastService.showErrorToast('Não foi possível abrir métricas.');
+    }
   }
 }

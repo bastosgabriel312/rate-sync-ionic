@@ -1,11 +1,16 @@
 <ion-header class="ion-no-border rs-header">
   <ion-toolbar>
-    <ion-title class="rs-brand">Rate<span class="rs-brand-accent">Sync</span></ion-title>
     <ion-buttons slot="primary">
       <ion-button shape="round" size="small" aria-label="Sobre o RateSync" (click)="onPresentPopover($event)">
         <ion-icon slot="icon-only" name="information-circle"></ion-icon>
       </ion-button>
+      @if (isDev) {
+        <ion-button shape="round" size="small" aria-label="Metrics" (click)="showMetrics()">
+          <ion-icon slot="icon-only" name="speedometer-outline"></ion-icon>
+        </ion-button>
+      }
     </ion-buttons>
+    <ion-title class="rs-brand">Rate<span class="rs-brand-accent">Sync</span></ion-title>
   </ion-toolbar>
   <ion-toolbar class="rs-search-toolbar">
     <app-search-bar (searchChange)="onSearch($event)" (searchCleared)="onSearchClear()"/>

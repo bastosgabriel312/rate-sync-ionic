@@ -15,6 +15,10 @@ export class ApiService {
     this.socket$ = this.wsService.connect(`${environment.apiDomain}/ws/find_movie/`);
   }
 
+  getMetrics(): Observable<any> {
+    return this.http.get<any>(`${environment.apiDomain}/metrics`);
+  }
+
   searchMovies(query: string): void {
     if (query) {
       this.socket$.next(query);

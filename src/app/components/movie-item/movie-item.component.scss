@@ -1,9 +1,11 @@
 .rs-card {
+  display: flex;
+  flex-direction: column;
+  height: auto; /* allow natural content height so cards aren't excessively tall on small screens */
   background: var(--rs-color-surface);
   border: 1px solid var(--rs-color-border-soft);
   border-radius: var(--rs-radius-lg);
   overflow: hidden;
-  height: 100%;
 }
 
 .rs-card--expanded {
@@ -13,8 +15,10 @@
 
 .rs-card__toggle {
   display: flex;
+  flex: 1;
   flex-direction: column;
   width: 100%;
+  height: 100%;
   padding: 0;
   margin: 0;
   border: 0;
@@ -53,9 +57,11 @@
 }
 
 .rs-card__body {
+  flex: 1;
   padding: var(--rs-space-3);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: var(--rs-space-1);
 }
 
@@ -107,18 +113,85 @@
 .rs-source {
   display: flex;
   align-items: center;
-  gap: var(--rs-space-2);
-  flex-wrap: wrap;
+  gap: var(--rs-space-1) var(--rs-space-2);
+  flex-wrap: nowrap; /* keep tone icon on same row as rating */
+  min-width: 0;
+}
+
+.rs-source__rating,
+.rs-source__meta {
+  min-width: 0; /* allow truncation inside flex */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rs-source__badge {
   font-size: var(--rs-text-xs);
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: var(--rs-radius-full);
   color: var(--rs-text-primary);
   background: var(--rs-color-surface-active);
   border: 1px solid var(--rs-color-border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+  .rs-source {
+    display: grid;
+    /* badge | info (rating + meta) | tone */
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    row-gap: var(--rs-space-1);
+    column-gap: var(--rs-space-2);
+  }
+
+  .rs-source__badge {
+    font-size: 0.625rem;
+  }
+
+  .rs-source__info {
+    display: flex;
+    flex-direction: row; /* keep rating and vote count on same line */
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+
+  .rs-source__rating {
+    flex: 0 0 auto;
+  }
+
+  .rs-source__meta {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rs-source__rating,
+  .rs-source__meta {
+    font-size: 0.6875rem;
+  }
+
+  .rs-source__tone {
+    margin-left: 0;
+    justify-self: end;
+    align-self: start; /* align with the top of rating/info so icon sits beside the rating */
+  }
+
+  /* reduce poster height and padding on small screens so cards don't become excessively tall */
+  .rs-card__poster {
+    aspect-ratio: 2 / 3;
+    max-height: 200px;
+    overflow: hidden;
+  }
+
+  .rs-card__body {
+    padding: var(--rs-space-2);
+  }
 }
 
 .rs-source__badge--cinemeta,
@@ -147,20 +220,23 @@
 }
 
 .rs-source__rating {
-  font-size: var(--rs-text-md);
+  font-size: var(--rs-text-sm);
   font-weight: 700;
   color: var(--rs-text-primary);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .rs-source__meta {
-  font-size: var(--rs-text-xs);
+  font-size: 0.6875rem;
   color: var(--rs-text-muted);
+  white-space: nowrap;
 }
 
 .rs-source__tone {
   margin-left: auto;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .rs-source__tone--good {
